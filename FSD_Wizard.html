@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSD Wizard - Foreign Service Entitlements Tool</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --accent: #c8102e;
+    --light: #f4f6f9;
+    --border: #d0d7de;
+    --green: #1a7f45;
+    --orange: #b45309;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --card: #ffffff;
+    --shadow: 0 2px 8px rgba(0,0,0,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--text); font-size: 14px; }
+  a { color: var(--primary); }
+
+  /* HEADER */
+  header { background: var(--primary); color: #fff; padding: 18px 32px; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  header span { font-size: 13px; opacity: 0.75; }
+  .maple { font-size: 28px; }
+
+  /* NOTICE */
+  .notice { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 20px; font-size: 13px; color: #78350f; }
+  .notice strong { font-weight: 600; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-wrap { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
+
+  /* FORM COLUMNS */
+  .form-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: start; margin-bottom: 28px; }
+  .form-col { background: var(--card); border-radius: 12px; box-shadow: var(--shadow); padding: 20px; }
+  .form-col h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .form-group select, .form-group input { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: #fff; color: var(--text); }
+  .form-group select:focus, .form-group input:focus { outline: 2px solid var(--primary); border-color: var(--primary); }
+  .form-group .hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-calculate { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; transition: background 0.2s; }
+  .btn-calculate:hover { background: #a50e27; }
+
+  /* RESULTS PAGE */
+  .results-topbar { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .results-topbar h2 { font-size: 20px; color: var(--primary); font-weight: 700; margin: 0; }
+  .btn-back { background: var(--card); color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+  .btn-back:hover { background: var(--primary); color: #fff; }
+  .results-panel h2 { font-size: 18px; color: var(--primary); margin-bottom: 16px; font-weight: 700; }
+
+  /* SUMMARY CARDS */
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .summary-card { background: var(--card); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; border-top: 3px solid var(--primary); }
+  .summary-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+  .summary-card .value { font-size: 22px; font-weight: 700; color: var(--primary); margin-top: 4px; }
+  .summary-card .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* FSD ACCORDION */
+  .fsd-section { background: var(--card); border-radius: 10px; box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
+  .fsd-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; user-select: none; border-left: 4px solid var(--primary); transition: background 0.15s; }
+  .fsd-header:hover { background: #f0f4fa; }
+  .fsd-header.eligible { border-left-color: var(--green); }
+  .fsd-header.not-eligible { border-left-color: var(--border); opacity: 0.7; }
+  .fsd-header.info-only { border-left-color: var(--orange); }
+  .fsd-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .fsd-num { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--light); border-radius: 4px; padding: 2px 6px; }
+  .fsd-badge { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
+  .badge-eligible { background: #dcfce7; color: var(--green); }
+  .badge-not-eligible { background: #f3f4f6; color: var(--muted); }
+  .badge-info { background: #fef3c7; color: var(--orange); }
+  .badge-amount { background: #dbeafe; color: #1e40af; }
+  .fsd-toggle { font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+  .fsd-toggle.open { transform: rotate(180deg); }
+  .fsd-body { padding: 0 18px 16px; border-top: 1px solid var(--border); display: none; }
+  .fsd-body.open { display: block; }
+  .fsd-body table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .fsd-body table th { background: var(--light); padding: 6px 10px; font-size: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .fsd-body table td { padding: 6px 10px; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+  .fsd-body table tr:last-child td { border-bottom: none; }
+  .fsd-body table .highlight { font-weight: 700; color: var(--primary); }
+  .fsd-rule { background: #f8fafc; border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .fsd-rule strong { color: var(--primary); }
+  .fsd-rule ul { margin: 6px 0 0 16px; }
+  .fsd-rule li { margin-bottom: 3px; }
+  .amount-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+  .amount-row:last-child { border-bottom: none; }
+  .amount-row .desc { font-size: 13px; color: var(--text); }
+  .amount-row .amount { font-size: 14px; font-weight: 700; color: #1e40af; }
+  .amount-row .per { font-size: 11px; color: var(--muted); }
+  .divider { border: none; border-top: 2px solid var(--border); margin: 12px 0; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+  .total-row .label { font-weight: 700; font-size: 14px; }
+  .total-row .amount { font-weight: 700; font-size: 16px; color: var(--green); }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: 600; margin: 2px; }
+  .tag-applies { background: #dcfce7; color: var(--green); }
+  .tag-na { background: #f3f4f6; color: var(--muted); }
+
+  /* PLACEHOLDER STATE */
+  .placeholder { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .placeholder h3 { font-size: 20px; margin-bottom: 8px; }
+  .placeholder p { font-size: 14px; }
+  .placeholder .icon { font-size: 56px; margin-bottom: 16px; }
+
+  /* CATEGORY HEADER */
+  .cat-header { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); padding: 12px 0 6px; }
+
+  /* FSD REFERENCE FOOTER */
+  .fsd-ref { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 6px 10px; background: #f0f4fa; border-radius: 5px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
+  .fsd-ref a { color: var(--primary); font-weight: 600; text-decoration: none; }
+  .fsd-ref a:hover { text-decoration: underline; }
+  .fsd-ref-icon { font-size: 13px; }
+
+  /* FSD 18 HIGHLIGHT */
+  .fsd18-alert { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .fsd18-alert strong { color: #9a3412; }
+  .fsd18-alert ul { margin: 6px 0 0 16px; }
+
+  /* FSP STEP DISPLAY */
+  .fsp-step-bar { display: flex; gap: 3px; margin: 6px 0 2px; }
+  .fsp-step-pip { flex: 1; height: 6px; border-radius: 3px; background: var(--border); }
+  .fsp-step-pip.active { background: var(--primary); }
+
+  /* TOOLTIP */
+  .tooltip-wrap { display: inline-flex; align-items: center; }
+  .tooltip-icon { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; cursor: default; margin-left: 5px; flex-shrink: 0; line-height: 1; }
+  #global-tooltip { display: none; position: fixed; z-index: 9999; width: 270px; background: #1a3a5c; color: #fff; font-size: 12px; line-height: 1.6; border-radius: 8px; padding: 10px 13px; box-shadow: 0 6px 24px rgba(0,0,0,0.28); pointer-events: none; }
+  .acro { border-bottom: 1px dotted var(--primary); cursor: help; }
+
+  /* POST SEARCH */
+  #post-search { margin-bottom: 4px; }
+
+  /* PRINT */
+  @media print {
+    .results-topbar { display: none; }
+    .fsd-body { display: block !important; }
+  }
+  @media (max-width: 1100px) {
+    .form-columns { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .form-columns { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="global-tooltip"></div>
+
+<header>
+  <span class="maple">🍁</span>
+  <div>
+    <h1>FSD Wizard</h1>
+    <span>Foreign Service Entitlements Calculator &mdash; Based on NJC Foreign Service Directives (April 1, 2025)</span>
+  </div>
+</header>
+
+<div class="notice">
+  <strong>Rate Notice:</strong> Dollar amounts reflect rates effective April 1, 2026 (FSP, PDA) and June 1, 2025 (PSA, PLA). Rates are updated annually &mdash; always verify against current NJC tables. Post Living Allowance requires a current post index from Statistics Canada.
+</div>
+
+<!-- PAGE 1: PROFILE FORM -->
+<div id="form-page" class="page active">
+  <div class="page-wrap">
+
+    <div class="form-columns">
+
+      <!-- COLUMN 1: EMPLOYMENT -->
+      <div class="form-col">
+        <h3>Employment</h3>
+        <div class="form-group">
+          <label>Employee Type</label>
+          <select id="emp-type">
+            <option value="career">Career Foreign Service (Rotational)</option>
+            <option value="fae">Foreign Assignment Employee (Occasional)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Annual Salary (CAD)</label>
+          <input type="number" id="salary" value="90000" min="40000" max="300000" step="500">
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;">
+            Foreign Service Points Accumulated
+            <span class="tooltip-wrap">
+              <span class="tooltip-icon" data-tip="&lt;strong&gt;How to calculate:&lt;/strong&gt; 1 point = 1 month of service outside Canada (from Oct 1, 1972). Add up every month worked abroad across all postings — points are portable and non-lapsing.&lt;br&gt;&lt;br&gt;Example: 3 years abroad = 36 pts (Step II). 8 years = 96 pts (Step III).">?</span>
+            </span>
+          </label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+            <div><label style="font-size:11px;color:#6b7280;">Total years abroad</label>
+              <input type="number" id="fsp-years" value="0" min="0" max="25" style="width:100%;padding:4px 8px;border:1px solid #d0d7de;border-radius:4px;font-size:12px;" oninput="calcFSPPoints()">
+            </div>
+            <div><label style="font-size:11px;color:#6b7280;">Additional months</label>
+              <input type="number" id="fsp-months-extra" value="0" min="0" max="11" style="width:100%;padding:4px 8px;border:1px solid #d0d7de;border-radius:4px;font-size:12px;" oninput="calcFSPPoints()">
+            </div>
+          </div>
+          <label style="font-size:12px;color:#6b7280;">Total Points (auto-calculated)</label>
+          <input type="number" id="fsp-points" value="0" min="0" max="300">
+          <div class="hint" id="fsp-step-hint">Step I (1-24 pts) &mdash; edit directly or use calculator above</div>
+        </div>
+      </div>
+
+      <!-- COLUMN 2: FAMILY -->
+      <div class="form-col">
+        <h3>Family</h3>
+        <div class="form-group">
+          <label>Dependants Accompanying to Post</label>
+          <select id="family-config">
+            <option value="0">None accompanying (Unaccompanied)</option>
+            <option value="1">1 Dependant at post</option>
+            <option value="2">2 Dependants at post</option>
+            <option value="3">3 Dependants at post</option>
+            <option value="4">4+ Dependants at post</option>
+          </select>
+          <div class="hint">Count only dependants physically relocating to your post.</div>
+        </div>
+        <div class="form-group">
+          <label>Dependants Remaining in Canada?</label>
+          <select id="deps-in-canada" onchange="toggleDepsInCanada()">
+            <option value="no">No (no dependants left behind)</option>
+            <option value="yes">Yes (spouse/children remain in Canada)</option>
+          </select>
+          <div class="hint">If YES, FSD 18 Special Family Separation Assistance applies.</div>
+        </div>
+        <div id="deps-canada-detail" style="display:none;">
+          <div class="form-group">
+            <label>Number of Dependants in Canada</label>
+            <input type="number" id="deps-canada-count" value="1" min="1" max="10">
+            <div class="hint">Spouse/CLP counts as 1 dependant. Include children.</div>
+          </div>
+          <div class="form-group">
+            <label>Are dependants in the Ottawa/Gatineau area?</label>
+            <select id="deps-in-hq">
+              <option value="yes">Yes (HQ city)</option>
+              <option value="no">No (elsewhere in Canada)</option>
+            </select>
+            <div class="hint">Affects shelter waiver amount under FSD 18.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Spouse/CLP Accompanying to Post?</label>
+          <select id="spouse">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Spouse/CLP Employed at Post?</label>
+          <select id="spouse-employed">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Children Under 6</label>
+            <input type="number" id="children-u6" value="0" min="0" max="10">
+          </div>
+          <div class="form-group">
+            <label>Children 6-18</label>
+            <input type="number" id="children-6-18" value="0" min="0" max="10">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Children 18-21</label>
+            <input type="number" id="children-18-21" value="0" min="0" max="10">
+          </div>
+          <div class="form-group">
+            <label>Children 21-23 (post-secondary)</label>
+            <input type="number" id="children-21-23" value="0" min="0" max="10">
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUMN 3: POSTING -->
+      <div class="form-col">
+        <h3>Posting</h3>
+        <div class="form-group">
+          <label>Post (City)</label>
+          <input type="text" id="post-search" placeholder="Search post..." oninput="filterPosts()">
+          <select id="post" size="1" onchange="onPostChange()" style="margin-top:4px;">
+            <option value="">-- Select Post --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Hardship Level</label>
+          <select id="hardship-level">
+            <option value="0">None (non-hardship)</option>
+            <option value="1">Level I</option>
+            <option value="2">Level II</option>
+            <option value="3">Level III</option>
+            <option value="4">Level IV</option>
+            <option value="5">Level V</option>
+          </select>
+          <div class="hint">Auto-filled when a post is selected above.</div>
+        </div>
+        <div class="form-group">
+          <label>Tour Duration</label>
+          <select id="tour-duration">
+            <option value="12">12 months</option>
+            <option value="24">24 months</option>
+            <option value="36" selected>36 months</option>
+            <option value="48">48 months</option>
+            <option value="60">60 months</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Post Living Allowance Index</label>
+          <input type="number" id="pla-index" value="120" min="100" max="250">
+          <div class="hint">Cost-of-living index from Statistics Canada. No allowance if 100 or below.</div>
+        </div>
+        <div class="form-group">
+          <label>Is this an Unhealthy Post?</label>
+          <select id="unhealthy">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- COLUMN 4: HOUSING & DAYCARE -->
+      <div class="form-col">
+        <h3>Housing</h3>
+        <div class="form-group">
+          <label>Housing Type at Post</label>
+          <select id="housing-type">
+            <option value="crown">Crown-Furnished</option>
+            <option value="private">Privately Leased / Unfurnished</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Principal Residence in Canada?</label>
+          <select id="principal-res">
+            <option value="no">No</option>
+            <option value="own">Yes &mdash; Renting it out</option>
+            <option value="vacant">Yes &mdash; Leaving vacant</option>
+            <option value="mortgage">Yes &mdash; With mortgage</option>
+          </select>
+        </div>
+
+        <h3 style="margin-top:20px;">Vehicle (PMV)</h3>
+        <div class="form-group">
+          <label>Do you have a vehicle to ship to post?</label>
+          <select id="pmv-ship" onchange="togglePMVFields()">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+          <div class="hint">The Crown ships 1 PMV as part of relocation (FSD 15).</div>
+        </div>
+        <div id="pmv-spouse-drive-wrap" class="form-group">
+          <label>Does your accompanying spouse/CLP also drive?</label>
+          <select id="pmv-spouse-drives">
+            <option value="no">No</option>
+            <option value="yes">Yes — both adults hold a valid licence</option>
+          </select>
+          <div class="hint">If yes, a second vehicle may be shipped.</div>
+        </div>
+
+        <h3 style="margin-top:20px;">Daycare</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Infants (0-18 mo)</label>
+            <input type="number" id="dc-infants" value="0" min="0" max="5">
+          </div>
+          <div class="form-group">
+            <label>Toddlers (18mo-3yr)</label>
+            <input type="number" id="dc-toddlers" value="0" min="0" max="5">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Preschool (3-6 yr)</label>
+            <input type="number" id="dc-preschool" value="0" min="0" max="5">
+          </div>
+          <div class="form-group">
+            <label>Actual Monthly Cost</label>
+            <input type="number" id="dc-actual-cost" value="2000" min="0">
+            <div class="hint">Per child at post</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .form-columns -->
+
+    <button class="btn-calculate" onclick="calculate()">&#9654; Calculate My Entitlements</button>
+
+  </div><!-- end .page-wrap -->
+</div><!-- end #form-page -->
+
+<!-- PAGE 2: RESULTS -->
+<div id="results-page" class="page">
+  <div class="page-wrap">
+    <div class="results-topbar">
+      <button class="btn-back" onclick="showForm()">&#8592; Back to Profile</button>
+      <h2 id="results-heading">Entitlements Summary</h2>
+    </div>
+    <div id="results-panel"></div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// DATA TABLES
+// =====================================================================
+
+// PSA rates by post (Effective June 1, 2025, CAD)
+const PSA_RATES = {
+  "Abidjan, Cote d'Ivoire": 7166,
+  "Abu Dhabi, United Arab Emirates": 5545,
+  "Abuja, Nigeria": 6916,
+  "Accra, Ghana": 4478,
+  "Addis Ababa, Ethiopia": 3369,
+  "Algiers, Algeria": 3584,
+  "Amman, Jordan": 3451,
+  "Ankara, Turkey": 6445,
+  "Astana, Kazakhstan": 4575,
+  "Athens, Greece": 3369,
+  "Atlanta, USA": 3084,
+  "Auckland, New Zealand": 7137,
+  "Baghdad, Iraq": 7598,
+  "Bamako, Mali": 3703,
+  "Bandar Seri Begawan, Brunei Darussalam": 11329,
+  "Bangalore, India": 5261,
+  "Bangkok, Thailand": 6930,
+  "Barcelona, Spain": 4486,
+  "Beijing, China": 12211,
+  "Beirut, Lebanon": 4958,
+  "Belgrade, Serbia": 4143,
+  "Berlin, Germany": 5134,
+  "Berne, Switzerland": 5057,
+  "Bogota, Colombia": 5157,
+  "Boston, USA": 1740,
+  "Brasilia, Brazil": 8604,
+  "Bratislava, Slovakia": 3097,
+  "Bridgetown, Barbados": 4585,
+  "Brussels, Belgium": 4367,
+  "Bucharest, Romania": 4050,
+  "Budapest, Hungary": 3756,
+  "Buenos Aires, Argentina": 8652,
+  "Cairo, Egypt": 2659,
+  "Canberra, Australia": 10567,
+  "Chandigarh, India": 5405,
+  "Chicago, USA": 3026,
+  "Chongqing, China": 11459,
+  "Colombo, Sri Lanka": 3442,
+  "Colorado Springs, USA": 3476,
+  "Copenhagen, Denmark": 3738,
+  "Cotonou, Benin": 7311,
+  "Dakar, Senegal": 6517,
+  "Dallas, USA": 3439,
+  "Dar-es-Salaam, Tanzania": 5721,
+  "Denver, USA": 3472,
+  "Detroit, USA": 2896,
+  "Dhaka, Bangladesh": 3623,
+  "Doha, Qatar": 3606,
+  "Dubai, United Arab Emirates": 4083,
+  "Dublin, Ireland": 4661,
+  "Dusseldorf, Germany": 5232,
+  "Erbil, Iraqi Kurdistan": 6665,
+  "Geneva, Switzerland": 4913,
+  "Georgetown, Guyana": 4273,
+  "Guadalajara, Mexico": 5352,
+  "Guangzhou, China": 12046,
+  "Guatemala City, Guatemala": 6495,
+  "Hague, Netherlands": 4196,
+  "Hanoi, Vietnam": 12527,
+  "Harare, Zimbabwe": 3660,
+  "Havana, Cuba": 5983,
+  "Helsinki, Finland": 4129,
+  "Ho Chi Minh City, Vietnam": 12521,
+  "Hong Kong, China": 5136,
+  "Houston, USA": 3466,
+  "Islamabad, Pakistan": 5356,
+  "Istanbul, Turkey": 6269,
+  "Jakarta, Indonesia": 8097,
+  "Johannesburg, South Africa": 6425,
+  "Juba, South Sudan": 4210,
+  "Kigali, Rwanda": 5203,
+  "Kingston, Jamaica": 3992,
+  "Kinshasa, DR Congo": 7488,
+  "Kuala Lumpur, Malaysia": 14875,
+  "Kuwait City, Kuwait": 3648,
+  "Kyiv, Ukraine": 5204,
+  "La Paz, Bolivia": 7058,
+  "Lagos, Nigeria": 7335,
+  "Lima, Peru": 6787,
+  "Lisbon, Portugal": 3943,
+  "London, UK": 4360,
+  "Los Angeles, USA": 2967,
+  "Lusaka, Zambia": 3830,
+  "Lyon, France": 6420,
+  "Madrid, Spain": 4491,
+  "Managua, Nicaragua": 6449,
+  "Manila, Philippines": 8948,
+  "Maputo, Mozambique": 5784,
+  "Mexico City, Mexico": 4793,
+  "Miami, USA": 2899,
+  "Milan, Italy": 4563,
+  "Minneapolis, USA": 2963,
+  "Monterrey, Mexico": 4841,
+  "Montevideo, Uruguay": 8065,
+  "Moscow, Russia": 4726,
+  "Mumbai, India": 5262,
+  "Munich, Germany": 5106,
+  "Nagoya, Japan": 8761,
+  "Nairobi, Kenya": 3783,
+  "New Delhi, India": 5222,
+  "New York, USA": 1877,
+  "Oslo, Norway": 3297,
+  "Ouagadougou, Burkina Faso": 6472,
+  "Panama City, Panama": 5808,
+  "Paris, France": 4499,
+  "Phnom Penh, Cambodia": 13457,
+  "Port-au-Prince, Haiti": 8103,
+  "Port of Spain, Trinidad and Tobago": 4426,
+  "Prague, Czech Republic": 3943,
+  "Pretoria, South Africa": 6425,
+  "Quito, Ecuador": 7063,
+  "Rabat, Morocco": 7695,
+  "Ramallah, West Bank": 5696,
+  "Reykjavik, Iceland": 2223,
+  "Riga, Latvia": 4120,
+  "Rio de Janeiro, Brazil": 7557,
+  "Riyadh, Saudi Arabia": 3938,
+  "Rome/Vatican, Italy": 4569,
+  "San Diego, USA": 3016,
+  "San Francisco, USA": 3483,
+  "San Jose, Costa Rica": 4411,
+  "San Salvador, El Salvador": 5460,
+  "Santiago, Chile": 7765,
+  "Santo Domingo, Dominican Republic": 5851,
+  "Sao Paulo, Brazil": 7544,
+  "Seattle, USA": 3476,
+  "Seoul, South Korea": 4682,
+  "Shanghai, China": 12309,
+  "Singapore, Singapore": 6830,
+  "Stockholm, Sweden": 3775,
+  "Suva, Fiji": 4328,
+  "Sydney, Australia": 10015,
+  "Taipei, Taiwan": 3280,
+  "Tallinn, Estonia": 4074,
+  "Tegucigalpa, Honduras": 5595,
+  "Tel Aviv, Israel": 5714,
+  "Tokyo, Japan": 8512,
+  "Tunis, Tunisia": 2855,
+  "Ulaanbaatar, Mongolia": 9267,
+  "Vienna, Austria": 4397,
+  "Vientiane, Laos": 9232,
+  "Vilnius, Lithuania": 3681,
+  "Warsaw, Poland": 3658,
+  "Washington DC, USA": 2238,
+  "Wellington, New Zealand": 3722,
+  "Yangon, Myanmar": 6124,
+  "Yaounde, Cameroon": 5375,
+  "Yerevan, Armenia": 3960,
+  "Zagreb, Croatia": 5371,
+};
+
+// Post Differential Allowance levels by post (Appendix B of FSD 58, effective April 1, 2026)
+const PDA_LEVELS = {
+  "Abidjan, Cote d'Ivoire": 4,
+  "Abu Dhabi, United Arab Emirates": 2,
+  "Abuja, Nigeria": 5,
+  "Accra, Ghana": 3,
+  "Addis Ababa, Ethiopia": 5,
+  "Algiers, Algeria": 5,
+  "Amman, Jordan": 4,
+  "Ankara, Turkey": 3,
+  "Astana, Kazakhstan": 5,
+  "Athens, Greece": 1,
+  "Baghdad, Iraq": 5,
+  "Bamako, Mali": 5,
+  "Bandar Seri Begawan, Brunei Darussalam": 2,
+  "Bangalore, India": 4,
+  "Bangkok, Thailand": 4,
+  "Beijing, China": 3,
+  "Beirut, Lebanon": 5,
+  "Belgrade, Serbia": 3,
+  "Bogota, Colombia": 4,
+  "Brasilia, Brazil": 3,
+  "Bridgetown, Barbados": 2,
+  "Bucharest, Romania": 2,
+  "Buenos Aires, Argentina": 3,
+  "Cairo, Egypt": 4,
+  "Chandigarh, India": 5,
+  "Chongqing, China": 4,
+  "Colombo, Sri Lanka": 4,
+  "Cotonou, Benin": 4,
+  "Dakar, Senegal": 3,
+  "Dar-es-Salaam, Tanzania": 5,
+  "Dhaka, Bangladesh": 5,
+  "Doha, Qatar": 3,
+  "Dubai, United Arab Emirates": 2,
+  "Erbil, Iraqi Kurdistan": 5,
+  "Georgetown, Guyana": 4,
+  "Guadalajara, Mexico": 3,
+  "Guangzhou, China": 3,
+  "Guatemala City, Guatemala": 4,
+  "Hanoi, Vietnam": 4,
+  "Harare, Zimbabwe": 4,
+  "Havana, Cuba": 5,
+  "Ho Chi Minh City, Vietnam": 3,
+  "Hong Kong, China": 1,
+  "Islamabad, Pakistan": 5,
+  "Istanbul, Turkey": 2,
+  "Jakarta, Indonesia": 3,
+  "Johannesburg, South Africa": 3,
+  "Juba, South Sudan": 5,
+  "Khartoum, Sudan": 5,
+  "Kigali, Rwanda": 3,
+  "Kingston, Jamaica": 4,
+  "Kinshasa, DR Congo": 5,
+  "Kuala Lumpur, Malaysia": 2,
+  "Kuwait City, Kuwait": 3,
+  "Kyiv, Ukraine": 3,
+  "La Paz, Bolivia": 4,
+  "Lagos, Nigeria": 5,
+  "Lima, Peru": 3,
+  "Lusaka, Zambia": 3,
+  "Managua, Nicaragua": 4,
+  "Manila, Philippines": 3,
+  "Maputo, Mozambique": 5,
+  "Mexico City, Mexico": 3,
+  "Monterrey, Mexico": 3,
+  "Montevideo, Uruguay": 2,
+  "Moscow, Russia": 4,
+  "Mumbai, India": 4,
+  "Nairobi, Kenya": 4,
+  "New Delhi, India": 5,
+  "Ouagadougou, Burkina Faso": 5,
+  "Panama City, Panama": 2,
+  "Phnom Penh, Cambodia": 4,
+  "Port-au-Prince, Haiti": 5,
+  "Port of Spain, Trinidad and Tobago": 3,
+  "Pretoria, South Africa": 3,
+  "Quito, Ecuador": 3,
+  "Rabat, Morocco": 3,
+  "Ramallah, West Bank": 4,
+  "Rio de Janeiro, Brazil": 3,
+  "Riyadh, Saudi Arabia": 5,
+  "San Jose, Costa Rica": 3,
+  "San Salvador, El Salvador": 4,
+  "Santiago, Chile": 3,
+  "Santo Domingo, Dominican Republic": 4,
+  "Sao Paulo, Brazil": 3,
+  "Seoul, South Korea": 1,
+  "Shanghai, China": 3,
+  "Singapore, Singapore": 0,
+  "Suva, Fiji": 2,
+  "Taipei, Taiwan": 2,
+  "Tegucigalpa, Honduras": 4,
+  "Tel Aviv, Israel": 3,
+  "Tunis, Tunisia": 5,
+  "Ulaanbaatar, Mongolia": 4,
+  "Vientiane, Laos": 3,
+  "Warsaw, Poland": 2,
+  "Wellington, New Zealand": 3,
+  "Yangon, Myanmar": 5,
+  "Yaounde, Cameroon": 5,
+  "Yerevan, Armenia": 3,
+};
+
+// Unhealthy posts (FSD 38 Appendix A)
+const UNHEALTHY_POSTS = new Set([
+  "Abidjan, Cote d'Ivoire","Abuja, Nigeria","Accra, Ghana","Addis Ababa, Ethiopia",
+  "Algiers, Algeria","Amman, Jordan","Astana, Kazakhstan","Baghdad, Iraq","Bamako, Mali",
+  "Bangalore, India","Bangkok, Thailand","Beirut, Lebanon","Bogota, Colombia",
+  "Brasilia, Brazil","Buenos Aires, Argentina","Cairo, Egypt","Chandigarh, India",
+  "Chongqing, China","Colombo, Sri Lanka","Cotonou, Benin","Dakar, Senegal",
+  "Dar-es-Salaam, Tanzania","Dhaka, Bangladesh","Doha, Qatar","Erbil, Iraqi Kurdistan",
+  "Georgetown, Guyana","Guangzhou, China","Guatemala City, Guatemala","Hanoi, Vietnam",
+  "Harare, Zimbabwe","Havana, Cuba","Ho Chi Minh City, Vietnam","Islamabad, Pakistan",
+  "Jakarta, Indonesia","Johannesburg, South Africa","Juba, South Sudan","Khartoum, Sudan",
+  "Kigali, Rwanda","Kingston, Jamaica","Kinshasa, DR Congo","Kuala Lumpur, Malaysia",
+  "Kuwait City, Kuwait","Kyiv, Ukraine","La Paz, Bolivia","Lagos, Nigeria","Lima, Peru",
+  "Lusaka, Zambia","Managua, Nicaragua","Manila, Philippines","Maputo, Mozambique",
+  "Mexico City, Mexico","Monterrey, Mexico","Moscow, Russia","Mumbai, India","Nairobi, Kenya",
+  "New Delhi, India","Ouagadougou, Burkina Faso","Panama City, Panama","Phnom Penh, Cambodia",
+  "Port-au-Prince, Haiti","Pretoria, South Africa","Quito, Ecuador","Rabat, Morocco",
+  "Ramallah, West Bank","Riyadh, Saudi Arabia","San Salvador, El Salvador","Santiago, Chile",
+  "Santo Domingo, Dominican Republic","Sao Paulo, Brazil","Singapore, Singapore",
+  "Tegucigalpa, Honduras","Tel Aviv, Israel","Ulaanbaatar, Mongolia","Vientiane, Laos",
+  "Yangon, Myanmar","Yaounde, Cameroon"
+]);
+
+// PDA rates (annual, CAD, effective April 1, 2026) [level][dependants 0-4+]
+const PDA_RATES = {
+  0: [0, 0, 0, 0, 0],
+  1: [4492, 5843, 6749, 6969, 7148],
+  2: [6752, 8781, 10129, 10470, 10805],
+  3: [8992, 11688, 13491, 13939, 14387],
+  4: [13491, 17538, 20239, 20913, 21583],
+  5: [17988, 23385, 26982, 27879, 28781],
+};
+
+// FSP rates (annual, CAD, effective April 1, 2026) [step][dependants 0-4+]
+// Steps: 0=I(1-24pts), 1=II(25-60), 2=III(61-96), 3=IV(97-132), 4=V(133-168), 5=VI(169+)
+const FSP_RATES = {
+  0: [9194, 12873, 15448, 16221, 17029],
+  1: [13793, 19308, 23169, 24328, 25545],
+  2: [17929, 25105, 30124, 31626, 33207],
+  3: [19722, 27613, 33132, 34790, 36531],
+  4: [21694, 30376, 36447, 38270, 40183],
+  5: [23430, 32804, 39365, 41331, 43402],
+};
+
+// PLA Nominal Salary table (Effective June 1, 2025)
+// Format: [lower, upper, nominal, adjustment]
+const PLA_TABLE = [
+  [40450,41449,40950,1.118],[41450,42449,41950,1.095],[42450,43449,42950,1.073],
+  [43450,44449,43950,1.051],[44450,45449,44950,1.031],[45450,46449,45950,1.011],
+  [46450,47449,46950,0.993],[47450,48449,47950,0.975],[48450,49449,48950,0.957],
+  [49450,50449,49950,0.941],[50450,51449,50950,0.925],[51450,52449,51950,0.910],
+  [52450,53449,52950,0.895],[53450,54449,53950,0.881],[54450,55449,54950,0.867],
+  [55450,56449,55950,0.854],[56450,57449,56950,0.842],[57450,58449,57950,0.829],
+  [58450,59449,58950,0.818],[59450,60449,59950,0.806],[60450,61449,60950,0.795],
+  [61450,62449,61950,0.784],[62450,63449,62950,0.774],[63450,64449,63950,0.764],
+  [64450,65449,64950,0.754],[65450,66449,65950,0.745],[66450,67449,66950,0.736],
+  [67450,68449,67950,0.727],[68450,69449,68950,0.718],[69450,70449,69950,0.710],
+  [70450,71449,70950,0.702],[71450,72449,71950,0.694],[72450,73449,72950,0.686],
+  [73450,74449,73950,0.679],[74450,75449,74950,0.671],[75450,76449,75950,0.664],
+  [76450,77449,76950,0.657],[77450,78449,77950,0.651],[78450,79449,78950,0.644],
+  [79450,80449,79950,0.638],[80450,81449,80950,0.632],[81450,82449,81950,0.625],
+  [82450,83449,82950,0.620],[83450,84449,83950,0.614],[84450,85449,84950,0.608],
+  [85450,86449,85950,0.603],[86450,87449,86950,0.597],[87450,88449,87950,0.592],
+  [88450,89449,88950,0.587],[89450,90449,89950,0.582],[90450,91449,90950,0.577],
+  [91450,92449,91950,0.572],[92450,93449,92950,0.567],[93450,94449,93950,0.563],
+  [94450,95449,94950,0.558],[95450,96449,95950,0.554],[96450,97449,96950,0.549],
+  [97450,98449,97950,0.545],[98450,99449,98950,0.541],[99450,99999,99725,0.538],
+  [100000,Infinity,100000,0.537],
+];
+
+// =====================================================================
+// POPULATE POST DROPDOWN
+// =====================================================================
+(function initPosts() {
+  const sel = document.getElementById('post');
+  const posts = Object.keys(PSA_RATES).sort();
+  posts.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.text = p;
+    sel.add(opt);
+  });
+})();
+
+function filterPosts() {
+  const search = document.getElementById('post-search').value.toLowerCase();
+  const sel = document.getElementById('post');
+  const posts = Object.keys(PSA_RATES).sort();
+  while (sel.options.length > 1) sel.remove(1);
+  posts.filter(p => p.toLowerCase().includes(search)).forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.text = p;
+    sel.add(opt);
+  });
+}
+
+function onPostChange() {
+  const post = document.getElementById('post').value;
+  if (!post) return;
+  const level = PDA_LEVELS[post] || 0;
+  document.getElementById('hardship-level').value = level;
+  document.getElementById('unhealthy').value = UNHEALTHY_POSTS.has(post) ? 'yes' : 'no';
+}
+
+function toggleDepsInCanada() {
+  const val = document.getElementById('deps-in-canada').value;
+  document.getElementById('deps-canada-detail').style.display = val === 'yes' ? 'block' : 'none';
+}
+
+function togglePMVFields() {
+  const ship = document.getElementById('pmv-ship').value === 'yes';
+  document.getElementById('pmv-spouse-drive-wrap').style.display = ship ? 'block' : 'none';
+}
+
+// FSP Points calculator helper
+const FSP_STEP_LABELS = ['I (1-24 pts)', 'II (25-60 pts)', 'III (61-96 pts)', 'IV (97-132 pts)', 'V (133-168 pts)', 'VI (169+ pts)'];
+function calcFSPPoints() {
+  const years = parseInt(document.getElementById('fsp-years').value) || 0;
+  const months = parseInt(document.getElementById('fsp-months-extra').value) || 0;
+  const total = years * 12 + months;
+  document.getElementById('fsp-points').value = total;
+  const step = getFSPStep(total);
+  const pips = Array.from({length:6}, (_,i) => `<div class="fsp-step-pip ${i<=step?'active':''}"></div>`).join('');
+  document.getElementById('fsp-step-hint').innerHTML =
+    `<div class="fsp-step-bar">${pips}</div>Step ${FSP_STEP_LABELS[step]} &mdash; edit total directly if needed`;
+}
+
+// Update hint when points edited directly
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('fsp-points').addEventListener('input', function() {
+    const pts = parseInt(this.value) || 0;
+    const step = getFSPStep(pts);
+    const pips = Array.from({length:6}, (_,i) => `<div class="fsp-step-pip ${i<=step?'active':''}"></div>`).join('');
+    document.getElementById('fsp-step-hint').innerHTML =
+      `<div class="fsp-step-bar">${pips}</div>Step ${FSP_STEP_LABELS[step]}`;
+  });
+
+  // Global fixed tooltip — escapes overflow clipping of sticky panel
+  const tip = document.getElementById('global-tooltip');
+  document.addEventListener('mouseover', e => {
+    const icon = e.target.closest('.tooltip-icon');
+    if (!icon) return;
+    const content = icon.getAttribute('data-tip');
+    if (!content) return;
+    tip.innerHTML = content;
+    tip.style.display = 'block';
+  });
+  document.addEventListener('mousemove', e => {
+    if (tip.style.display !== 'block') return;
+    const x = e.clientX + 14;
+    const y = e.clientY + 14;
+    const maxX = window.innerWidth - 290;
+    tip.style.left = Math.min(x, maxX) + 'px';
+    tip.style.top = y + 'px';
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('.tooltip-icon')) tip.style.display = 'none';
+  });
+
+  // Wrap acronyms on the static sections at load time
+  wrapAcronymsInNode(document.querySelector('.notice'));
+  wrapAcronymsInNode(document.getElementById('form-page'));
+});
+
+// =====================================================================
+// ACRONYM GLOSSARY + DOM WALKER
+// =====================================================================
+const GLOSSARY = {
+  'FSP':   '<strong>Foreign Service Premium</strong><br>A tax-free annual allowance that rewards employees for time spent abroad. Grows through 6 steps based on total months of foreign service (1 point per month abroad).',
+  'PDA':   '<strong>Post Differential Allowance</strong><br>A hardship allowance for being posted to a difficult or dangerous location. Rated Level I (mild) to Level V (extreme). Increases by 50% after 24 consecutive months at the same hardship post.',
+  'PSA':   '<strong>Post Specific Allowance</strong><br>A non-accountable travel allowance based on 80% of a return economy airfare from your post to Ottawa. Loaded into your Travel Bank each June 30.',
+  'PLA':   '<strong>Post Living Allowance</strong><br>Compensates for a higher cost of living at your post compared to Canada. Only payable when the post cost-of-living index from Statistics Canada exceeds 100.',
+  'PTA':   '<strong>Post Travel Assistance</strong><br>A travel allowance so employees can take a break from their posting. How often you receive it depends on the hardship level — more frequent at harder posts.',
+  'PCF':   '<strong>Posting Confirmation Form</strong><br>The official document your department issues when a posting is confirmed. It triggers most FSD entitlements, including the posting loan.',
+  'CLP':   '<strong>Common-Law Partner</strong><br>Treated the same as a spouse under the FSDs for all entitlement purposes.',
+  'NJC':   '<strong>National Joint Council</strong><br>The joint union-employer body that writes and administers the Foreign Service Directives and other public service agreements.',
+  'PMV':   '<strong>Personally Owned Motor Vehicle</strong><br>Your personal car. The FSDs may cover shipping one vehicle (or two, if both adults drive) to your post.',
+  'PSHCP': '<strong>Public Service Health Care Plan</strong><br>The federal government health insurance plan covering employees and their dependants while posted abroad.',
+  'PSDCP': '<strong>Public Service Dental Care Plan</strong><br>The federal government dental insurance plan covering employees and their dependants.',
+  'HQ':    '<strong>Headquarters City</strong><br>For most employees, this is Ottawa/Gatineau. Used to determine shelter waivers and certain travel entitlements.',
+  'FAE':   '<strong>Foreign Assignment Employee</strong><br>An employee posted abroad on an occasional, non-rotational basis — as opposed to a Career Foreign Service employee who rotates regularly.',
+  'TBS':   '<strong>Treasury Board Secretariat</strong><br>The central government employer responsible for FSD policy, oversight, and annual reporting requirements.',
+  'IB':    '<strong>International Baccalaureate</strong><br>An internationally recognized high school diploma. Program and exam fees may be reimbursed under FSD 34.',
+  'AP':    '<strong>Advanced Placement</strong><br>University-level courses taken in high school. Program and exam fees may be reimbursed under FSD 34.',
+  'FSD':   '<strong>Foreign Service Directive</strong><br>One of the policy documents that govern pay, benefits, and conditions for Canadian public servants posted abroad. There are about 30 FSDs covering everything from shelter to education to hardship pay.',
+  'APEX':  '<strong>Advance Purchase Excursion Fare</strong><br>A discounted economy airfare purchased in advance. Used as the benchmark for calculating several travel allowances.',
+};
+
+const GLOSSARY_PATTERN = new RegExp('\\b(' + Object.keys(GLOSSARY).join('|') + ')\\b', 'g');
+
+function wrapAcronymsInNode(node) {
+  if (node.nodeType === 3) {
+    // Text node — replace acronyms
+    if (!GLOSSARY_PATTERN.test(node.textContent)) return;
+    GLOSSARY_PATTERN.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let last = 0, m;
+    GLOSSARY_PATTERN.lastIndex = 0;
+    const text = node.textContent;
+    while ((m = GLOSSARY_PATTERN.exec(text)) !== null) {
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const span = document.createElement('span');
+      span.className = 'acro tooltip-icon';
+      span.style.cssText = 'background:none;color:inherit;font-size:inherit;font-weight:inherit;width:auto;height:auto;border-radius:0;margin:0;display:inline;border-bottom:1px dotted #1a3a5c;cursor:help;';
+      span.setAttribute('data-tip', GLOSSARY[m[1]]);
+      span.textContent = m[1];
+      frag.appendChild(span);
+      last = GLOSSARY_PATTERN.lastIndex;
+    }
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    node.parentNode.replaceChild(frag, node);
+  } else if (node.nodeType === 1 && !['SCRIPT','STYLE','A','INPUT','SELECT','TEXTAREA'].includes(node.tagName)) {
+    [...node.childNodes].forEach(wrapAcronymsInNode);
+  }
+}
+
+// =====================================================================
+// UTILITY FUNCTIONS
+// =====================================================================
+const fmt = (n) => '$' + Math.round(n).toLocaleString('en-CA');
+const fmtM = (n) => '$' + Math.round(n).toLocaleString('en-CA') + '/mo';
+
+function getFSPStep(points) {
+  if (points < 25) return 0;
+  if (points < 61) return 1;
+  if (points < 97) return 2;
+  if (points < 133) return 3;
+  if (points < 169) return 4;
+  return 5;
+}
+
+function getDeps(config) { return parseInt(config); }
+
+function getPLAEntry(salary) {
+  const s = Math.min(salary, 100000);
+  for (const row of PLA_TABLE) {
+    if (s >= row[0] && s <= row[1]) return { nominal: row[2], adj: row[3] };
+  }
+  return { nominal: 100000, adj: 0.537 };
+}
+
+function calcPLA(salary, postIndex) {
+  if (postIndex <= 100) return 0;
+  const { nominal, adj } = getPLAEntry(salary);
+  const base = nominal * adj;
+  const atPost = base * (postIndex / 100);
+  return Math.max(0, atPost - base);
+}
+
+// =====================================================================
+// PAGE NAVIGATION
+// =====================================================================
+function showForm() {
+  document.getElementById('results-page').classList.remove('active');
+  document.getElementById('form-page').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showResults() {
+  document.getElementById('form-page').classList.remove('active');
+  document.getElementById('results-page').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =====================================================================
+// MAIN CALCULATE FUNCTION
+// =====================================================================
+function calculate() {
+  const empType = document.getElementById('emp-type').value;
+  const salary = parseFloat(document.getElementById('salary').value) || 90000;
+  const fspPoints = parseInt(document.getElementById('fsp-points').value) || 0;
+  const familyConfig = document.getElementById('family-config').value;
+  const deps = getDeps(familyConfig);
+  const depsInCanada = document.getElementById('deps-in-canada').value === 'yes';
+  const depsCanadaCount = depsInCanada ? (parseInt(document.getElementById('deps-canada-count').value) || 1) : 0;
+  const depsInHQ = depsInCanada ? document.getElementById('deps-in-hq').value === 'yes' : false;
+  const fsd18Applies = depsInCanada && depsCanadaCount > 0;
+  const spouseAccompanying = document.getElementById('spouse').value === 'yes';
+  const spouseEmployed = document.getElementById('spouse-employed').value === 'yes';
+  const childrenU6 = parseInt(document.getElementById('children-u6').value) || 0;
+  const children618 = parseInt(document.getElementById('children-6-18').value) || 0;
+  const children1821 = parseInt(document.getElementById('children-18-21').value) || 0;
+  const children2123 = parseInt(document.getElementById('children-21-23').value) || 0;
+  const totalChildren = childrenU6 + children618 + children1821 + children2123;
+  const post = document.getElementById('post').value;
+  const hardship = parseInt(document.getElementById('hardship-level').value);
+  const tourMonths = parseInt(document.getElementById('tour-duration').value);
+  const plaIndex = parseFloat(document.getElementById('pla-index').value) || 100;
+  const isUnhealthy = document.getElementById('unhealthy').value === 'yes';
+  const housingType = document.getElementById('housing-type').value;
+  const principalRes = document.getElementById('principal-res').value;
+  const pmvShip = document.getElementById('pmv-ship').value === 'yes';
+  const pmvSpouseDrives = pmvShip && spouseAccompanying && document.getElementById('pmv-spouse-drives').value === 'yes';
+  const pmvCount = pmvShip ? (pmvSpouseDrives ? 2 : 1) : 0;
+  const dcInfants = parseInt(document.getElementById('dc-infants').value) || 0;
+  const dcToddlers = parseInt(document.getElementById('dc-toddlers').value) || 0;
+  const dcPreschool = parseInt(document.getElementById('dc-preschool').value) || 0;
+  const dcActualCost = parseFloat(document.getElementById('dc-actual-cost').value) || 0;
+  const depIdx = Math.min(deps, 4);
+
+  // --- CALCULATIONS ---
+
+  // FSD 10 Posting Loan
+  const postingLoanMax = Math.min(56208, salary * 0.5);
+
+  // FSD 17 Spouse
+  const spouseEmploymentAllowance = (spouseAccompanying && !spouseEmployed) ? 937 : 0;
+  const spouseRetraining = spouseAccompanying ? 1000 : 0;
+
+  // FSD 32 Daycare
+  const DC_EMP_SHARE = 476.67;
+  const DC_CEILINGS = { infant: 5813.06, toddler: 5139.66, preschool: 3764.58 };
+  const dcChildCount = dcInfants + dcToddlers + dcPreschool;
+  let dcMonthlyBenefit = 0;
+  if (dcChildCount > 0) {
+    // Infant benefit (employer pays up to ceiling minus employee share)
+    dcMonthlyBenefit += dcInfants * Math.max(0, Math.min(dcActualCost, DC_CEILINGS.infant) - DC_EMP_SHARE);
+    dcMonthlyBenefit += dcToddlers * Math.max(0, Math.min(dcActualCost, DC_CEILINGS.toddler) - DC_EMP_SHARE);
+    dcMonthlyBenefit += dcPreschool * Math.max(0, Math.min(dcActualCost, DC_CEILINGS.preschool) - DC_EMP_SHARE);
+  }
+  const dcAnnualBenefit = dcMonthlyBenefit * 12;
+
+  // FSD 34 Education allowances (per year)
+  const EDU_SUPPLIES_PRIMARY = 84.72;
+  const EDU_SUPPLIES_SECONDARY = 193.21;
+  const EDU_POSTSEC_SHELTER_ANNUAL = 20053.10;
+  const EDU_RESIDENTIAL = 84700;
+  let eduAnnual = 0;
+  if (children618 > 0) {
+    // Approximation: half primary, half secondary for 6-18 range
+    const primary = Math.ceil(children618 / 2);
+    const secondary = Math.floor(children618 / 2);
+    eduAnnual += primary * EDU_SUPPLIES_PRIMARY + secondary * EDU_SUPPLIES_SECONDARY;
+  }
+  if (children1821 > 0) eduAnnual += children1821 * EDU_SUPPLIES_SECONDARY;
+  if (children2123 > 0) eduAnnual += children2123 * EDU_POSTSEC_SHELTER_ANNUAL;
+
+  // FSP (Foreign Service Premium - tax-free)
+  const fspStep = getFSPStep(fspPoints);
+  const fspAnnual = FSP_RATES[fspStep][depIdx];
+
+  // PSA (Post Specific Allowance)
+  const psaAnnual = post ? (PSA_RATES[post] || 0) : 0;
+
+  // PDA (Post Differential Allowance)
+  const pdaAnnual = PDA_RATES[hardship][depIdx];
+  const pdaBonusApplies = hardship > 0 && tourMonths >= 24;
+  const pdaWithBonus = pdaBonusApplies ? pdaAnnual * 1.5 : pdaAnnual;
+
+  // PLA (Post Living Allowance)
+  const plaAnnual = calcPLA(salary, plaIndex);
+
+  // FSD 50 Post Travel Assistance frequency
+  let ptaFreq = '';
+  let ptaTripsPerYear = 0;
+  if (hardship === 0) {
+    ptaFreq = '1 per tour (3+ year posting) or at end of posting';
+    ptaTripsPerYear = tourMonths >= 36 ? 1 / (tourMonths / 12) : 0;
+  } else if (hardship <= 2) {
+    ptaFreq = '1 per 2-year period + 1 per additional year';
+    ptaTripsPerYear = (tourMonths >= 24) ? 0.5 + Math.max(0, (tourMonths - 24) / 12) / (tourMonths / 12) : 0.5;
+  } else {
+    ptaFreq = '1 per year + 1 per additional year beyond normal tour';
+    ptaTripsPerYear = 1;
+  }
+
+  // FSD 51 Family Reunion (per dependent student, elementary/secondary: 3 trips/yr; postsec 21 or under: 2 trips/yr; postsec 22-23: 1 trip/yr)
+  const frTripsElemSec = children618 * 3 + children1821 * 3;
+  const frTripsPostSec2123 = children2123 * 1;
+
+  // TOTAL estimated annual financial value
+  const totalAnnual = fspAnnual + psaAnnual + pdaWithBonus + plaAnnual + dcAnnualBenefit + eduAnnual;
+
+  // --- RENDER ---
+  showResults();
+  document.getElementById('results-heading').textContent = 'Entitlements Summary' + (post ? ' \u2014 ' + post : '');
+  const panel = document.getElementById('results-panel');
+  const stepLabels = ['I (1-24 pts)', 'II (25-60 pts)', 'III (61-96 pts)', 'IV (97-132 pts)', 'V (133-168 pts)', 'VI (169+ pts)'];
+
+  panel.innerHTML = `
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Hardship Level</div>
+        <div class="value">${hardship === 0 ? 'None' : 'Level ' + ['','I','II','III','IV','V'][hardship]}</div>
+        <div class="sub">PDA: ${fmt(pdaAnnual)}/yr${pdaBonusApplies ? ' + 50% bonus' : ''}</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">FSP Step</div>
+        <div class="value">${stepLabels[fspStep]}</div>
+        <div class="sub">Premium: ${fmt(fspAnnual)}/yr (tax-free)</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Posting Loan (FSD 10)</div>
+        <div class="value">${fmt(postingLoanMax)}</div>
+        <div class="sub">Max advance &mdash; repaid over 48 months, no interest</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Est. Annual Allowances</div>
+        <div class="value">${fmt(totalAnnual)}</div>
+        <div class="sub">FSP + PDA + PSA + PLA + Daycare + Education</div>
+      </div>
+    </div>
+
+    <!-- PART I: PRE-POSTING -->
+    <div class="cat-header">Part I &mdash; Pre-Posting</div>
+
+    ${fsdSection('10','Posting Loan','eligible',fmt(postingLoanMax)+' max',`
+      <div class="fsd-rule">
+        <strong>Maximum advance:</strong> The lesser of <strong>${fmt(56208)}</strong> (April 1, 2026 rate) or <strong>50% of gross annual salary (${fmt(salary * 0.5)})</strong>.
+        For your salary of ${fmt(salary)}, the maximum is <strong>${fmt(postingLoanMax)}</strong>.
+        <ul>
+          <li>Repaid over up to 48 months via payroll deduction</li>
+          <li>No interest charged</li>
+          <li>Triggered by receipt of Posting Confirmation Form (PCF)</li>
+          <li>Loan suspended (not cancelled) during emergency evacuation</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('15','Relocation','eligible','Comprehensive',`
+      <div class="fsd-rule">
+        <strong>Key provisions:</strong>
+        <ul>
+          <li>Economy class air travel for employee and all dependants</li>
+          <li>Household effects: weight entitlement based on family size and accommodation type</li>
+          <li>Insurance: <strong>${housingType === 'crown' ? '$120,000' : '$140,000'}</strong> for ${housingType === 'crown' ? 'Crown-furnished' : 'unfurnished/privately leased'} accommodation (appraisal required for items over $1,500)</li>
+          <li>Claims administrator: Crawford &amp; Company Canada (30-day Notice of Intent; 60-day claim)</li>
+          <li>Storage of excess household effects in Canada</li>
+          <li>Temporary accommodation: 30 days at origin + 30 days at destination</li>
+          <li><strong>Mold/contamination protection (FSD 15.23.1):</strong> If household effects arrive contaminated with mold making the residence unsafe, temporary accommodation expenses are covered until the situation is resolved</li>
+          <li>Crossposting: transit may route through your last place of duty in Canada (not only Ottawa/Gatineau)</li>
+          <li>Deferred relocation travel available on posting termination</li>
+          <li><strong>Retirement:</strong> Members who use saved leave at the end of their career still qualify for relocation to a destination of choice</li>
+        </ul>
+      </div>
+      <div class="fsd-rule" style="margin-top:10px;background:#eff6ff;border-left:3px solid #1e40af;">
+        <strong>&#128176; Flexible Relocation Fund (Flex Fund) — FSD 15, ss.15.1.8–15.1.10 &amp; Appendix G</strong><br>
+        You may generate a Flex Fund by voluntarily giving up certain standard entitlements. The fund is built up from individual component amounts (per FSD 15 Appendix G, effective April 1, 2025):
+        <table style="margin-top:8px;font-size:12px;">
+          <tr><th>What you give up</th><th>Fund contribution</th></tr>
+          <tr><td>Business class travel (1st/2nd traveller)</td><td>$2,000 each</td></tr>
+          <tr><td>Business class (each additional traveller)</td><td>$1,500 each</td></tr>
+          <tr><td>Ship less than 75% of weight entitlement</td><td>$2,000</td></tr>
+          <tr><td>Ship less than 50% of weight entitlement</td><td>$3,000</td></tr>
+          <tr><td>Long-term storage of household effects</td><td>$2,000</td></tr>
+          <tr><td>Storage or shipment of PMV</td><td>$3,000</td></tr>
+        </table>
+        <ul style="margin-top:8px;">
+          <li><strong>How to spend funds:</strong> Shipping pets, extra baggage fees, local car rentals, hiring an additional person to support relocation travel, or other move-related costs with prior approval (FSD 15.1.10)</li>
+          <li>Receipts must be submitted within 6 months of arrival at new place of duty (FSD 15.1.11)</li>
+          <li>Speak with your FSD Administrator at the time of your PCF to elect this option</li>
+        </ul>
+      </div>
+      <div class="fsd-rule" style="margin-top:10px;">
+        <strong>&#128663; Personally Owned Motor Vehicle (PMV) — Vehicle Shipping:</strong>
+        ${pmvShip ? `
+        <ul>
+          <li>You are entitled to ship <strong>${pmvCount} vehicle${pmvCount > 1 ? 's' : ''}</strong>${pmvCount === 2 ? ' — both adults hold a valid licence' : ''}</li>
+          <li>The Crown arranges and pays for door-to-port shipping and customs clearance</li>
+          <li>Vehicle must be roadworthy, registered, and free of major modifications</li>
+          <li>Insurance during transit is provided; employee is responsible for coverage at post</li>
+          <li>Same entitlement applies on return to Canada</li>
+          <li>Note: Choosing not to ship your vehicle can contribute to generating a Flex Fund</li>
+          ${pmvSpouseDrives ? '' : spouseAccompanying ? '<li>If your spouse/CLP also holds a valid driver\'s licence, you may be entitled to ship a second vehicle — update your profile to reflect this.</li>' : ''}
+        </ul>
+        ` : `
+        <ul>
+          <li>You indicated no vehicle to ship — opting out contributes toward your Flex Fund eligibility</li>
+        </ul>
+        `}
+      </div>
+    `)}
+
+    ${principalRes !== 'no' ? fsdSection('16','Principal Residence','eligible','Eligible',`
+      <div class="fsd-rule">
+        <strong>Available provisions:</strong>
+        <ul>
+          ${principalRes === 'mortgage' ? '<li><strong>Mortgage interest differential:</strong> Max 5 years / max $5,000 (where home is rented out and rent does not cover mortgage)</li>' : ''}
+          ${principalRes === 'mortgage' ? '<li><strong>Prepayment penalty:</strong> Max 3 months\' interest or $5,000</li>' : ''}
+          <li>Property manager costs reimbursed where applicable</li>
+          <li>Rental income reconciliation required annually</li>
+        </ul>
+      </div>
+    `) : fsdSection('16','Principal Residence','not-eligible','Not Applicable',`
+      <div class="fsd-rule">Employee indicated no principal residence in Canada.</div>
+    `)}
+
+    ${fsdSection('12','Pre-Posting Training','eligible','Eligible',`
+      <div class="fsd-rule">
+        <strong>Covered expenses:</strong>
+        <ul>
+          <li>Language training costs</li>
+          <li>Travel to training location if different from headquarters city</li>
+          <li>Temporary accommodation during training if required</li>
+          <li>Authorized by deputy head prior to departure</li>
+        </ul>
+      </div>
+    `)}
+
+    <!-- PART II: AT POST - LIVING -->
+    <div class="cat-header">Part II &mdash; At Post: Living Conditions</div>
+
+    ${fsdSection('25','Shelter','eligible','Employer manages',`
+      <div class="fsd-rule">
+        <strong>Shelter Cost (employee contribution):</strong> Based on salary group and household size per Appendix A of FSD 25 (effective April 1, 2026). Check current rate table.
+        <ul>
+          <li>Space target (FSD 25.1.2): ${deps === 0 ? '2-bedroom (1 person)' : deps <= 3 ? '3-bedroom (2-4 persons)' : '4-bedroom (5+ persons)'} — these are targets/guidelines, not absolute rules; flexibility exists for atypical family configurations</li>
+          <li>Housing type: <strong>${housingType === 'crown' ? 'Crown-Furnished' : 'Privately Leased'}</strong></li>
+          <li>Deficiency adjustment: 10% / 20% / 30% for inadequate space</li>
+          <li>Security deposit advance: up to 6 months' rent</li>
+          <li>Utilities reimbursed for Crown-furnished accommodation</li>
+          <li><strong>Self-serve maintenance (FSD 25.5.3):</strong> No prior deputy head approval is required for repairs or maintenance unless the anticipated cost exceeds <strong>$500</strong> for any one service, or $1,000 in any fiscal year</li>
+          <li>If major appliances are broken or missing, corrective action must be taken <strong>as quickly as possible</strong> — you have grounds to demand timely resolution</li>
+          <li>Shelter cost ceases on last day of posting + travel days</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('30','Post Transportation','eligible','Crown Vehicle at Post',`
+      <div class="fsd-rule">
+        <strong>Crown-provided vehicle for use at post:</strong> The Crown provides a vehicle for official duties. When you use it for personal purposes, a usage charge applies:
+        <ul>
+          <li>Personal use charge: <strong>$4,332/yr</strong> | <strong>$361/mo</strong> | <strong>$18/day</strong> (deducted from pay)</li>
+          <li>Road tax and registration at post: reimbursed by Crown</li>
+          <li>Parking at post: covered</li>
+          <li>Commuting assistance where public transit is not available or adequate</li>
+          ${deps > 0 ? '<li>Transportation for dependent children to/from school: covered</li>' : ''}
+        </ul>
+        <strong>Note:</strong> If you ship your own PMV (see FSD 15), you may use it personally and the Crown vehicle is used for official duties only.
+      </div>
+    `)}
+
+    <!-- PART III: FAMILY -->
+    <div class="cat-header">Part III &mdash; Family</div>
+
+    ${spouseAccompanying && !spouseEmployed ? fsdSection('17','Spouse/CLP Assistance','eligible',fmt(937)+'/yr + benefits',`
+      <div class="fsd-rule">
+        <strong>Benefits for accompanying spouse/CLP:</strong>
+        <ul>
+          <li><strong>Employment Allowance:</strong> ${fmt(937)}/yr (effective April 1, 2026) — where employment is not reasonably available at post</li>
+          <li><strong>Retraining:</strong> Up to ${fmt(1000)} per posting</li>
+          <li><strong>Association/professional dues:</strong> Up to 2 memberships reimbursed</li>
+          <li><strong>Re-employment support eligibility (FSD 17.2.1(a)):</strong> Spouse/CLP qualifies if they were employed within the <strong>3 years</strong> prior to departure from Canada or from the employee's post</li>
+          <li><strong>Common-law eligibility (FSD 2 Appendix A):</strong> Recognition requires at least 1 year of cohabitation in the community — no additional financial ties (joint accounts, etc.) are required</li>
+        </ul>
+      </div>
+    `) : spouseAccompanying && spouseEmployed ? fsdSection('17','Spouse/CLP Assistance','info-only','Partial — Employed at Post',`
+      <div class="fsd-rule">
+        <strong>Spouse/CLP is employed at post.</strong> The Employment Allowance (${fmt(937)}/yr) is not payable when the spouse/CLP is employed. The following benefits still apply:
+        <ul>
+          <li><strong>Retraining:</strong> Up to ${fmt(1000)} per posting</li>
+          <li><strong>Association/professional dues:</strong> Up to 2 memberships reimbursed</li>
+        </ul>
+      </div>
+    `) : fsdSection('17','Spouse/CLP Assistance','not-eligible','Not Applicable',`<div class="fsd-rule">Spouse/CLP is not accompanying to post.</div>`)}
+
+    ${fsd18Applies ? fsdSection('18','Special Family Separation Assistance','eligible','APPLIES — Dependants in Canada',`
+      <div class="fsd18-alert">
+        <strong>&#9888; FSD 18 applies because you have ${depsCanadaCount} dependant(s) remaining in Canada while you are posted abroad.</strong>
+        <ul>
+          <li><strong>Shelter waiver:</strong> ${depsInHQ ? '<strong>100% shelter cost waived</strong> — dependants are in Ottawa/Gatineau (HQ city)' : 'Partial shelter waiver — dependants are outside the HQ city. Exact amount set by deputy head.'}</li>
+          <li><strong>Family Reunion Travel:</strong> Employee may travel to see dependants (or bring them to post) — <strong>1 trip per 6-month separation period</strong></li>
+          <li><strong>Education:</strong> Deputy head may authorize schooling/relocation costs for separated dependent children</li>
+          <li><strong>Relocation of dependants:</strong> Dependants may be relocated to a third location at Crown expense under s.15.31 of FSD 15</li>
+          <li>Subsection 18.11.1 use must be reported annually per FSD 70</li>
+        </ul>
+      </div>
+    `, 'FSD 18 — Sections 18.1 to 18.11', 'd250') : (deps === 0 ? fsdSection('18','Special Family Separation Assistance','not-eligible','Not Applicable',`
+      <div class="fsd-rule">No dependants remaining in Canada indicated. If you have a family that will remain in Canada while you are posted abroad, select "Yes" under "Dependants Remaining in Canada" in your profile.</div>
+    `, 'FSD 18', 'd250') : '')}
+
+    ${dcChildCount > 0 ? fsdSection('32','Daycare Assistance','eligible',fmt(dcAnnualBenefit)+'/yr est.',`
+      <div class="fsd-rule">
+        <strong>Employee share:</strong> ${fmtM(DC_EMP_SHARE)} per child (all ages, effective April 1, 2026)<br>
+        <strong>Monthly ceilings (employer max contribution):</strong>
+        <ul>
+          <li>Infants (0-18 months): ${fmtM(DC_CEILINGS.infant)} — you have <strong>${dcInfants}</strong></li>
+          <li>Toddlers (18 mo – 3 yr): ${fmtM(DC_CEILINGS.toddler)} — you have <strong>${dcToddlers}</strong></li>
+          <li>Preschool (3-6 yr): ${fmtM(DC_CEILINGS.preschool)} — you have <strong>${dcPreschool}</strong></li>
+        </ul>
+        <strong>Registration fee:</strong> $250/child/year (non-refundable)<br>
+        <strong>Estimated annual employer benefit for your children:</strong> <span style="color:#1e40af;font-weight:700;">${fmt(dcAnnualBenefit)}</span><br>
+        <em>Note: Actual benefit depends on actual cost at post. Nannies are not covered.</em>
+      </div>
+    `) : fsdSection('32','Daycare Assistance','not-eligible','No Eligible Children',`<div class="fsd-rule">No children in daycare age range entered.</div>`)}
+
+    ${empType === 'career' ? fsdSection('33','Education at Lycée in Canada','eligible','Career employees only',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Child must be minimum 3 years 8 months by September 1</li>
+          <li>Maximum 6 years of entitlement</li>
+          <li>Career foreign service employees only (not foreign assignment employees)</li>
+          <li>Costs covered per actual program fees</li>
+        </ul>
+      </div>
+    `) : fsdSection('33','Education at Lycée in Canada','not-eligible','Career employees only',`<div class="fsd-rule">FSD 33 applies to career foreign service employees only.</div>`)}
+
+    ${totalChildren > 0 ? fsdSection('34','Education Allowances','eligible',fmt(eduAnnual)+'/yr est.',`
+      <div class="fsd-rule">
+        <strong>Key annual rates (effective August 1, 2025):</strong>
+        <table>
+          <tr><th>Item</th><th>Annual Amount</th></tr>
+          <tr><td>School supplies (JK-Grade 8)</td><td class="highlight">${fmt(84.72)}</td></tr>
+          <tr><td>School supplies (Grades 9-12)</td><td class="highlight">${fmt(193.21)}</td></tr>
+          <tr><td>Residential school (away from post)</td><td class="highlight">${fmt(84700)}</td></tr>
+          <tr><td>Secondary education away from post (not Canada)</td><td class="highlight">${fmt(84700)}</td></tr>
+          <tr><td>Post-secondary shelter assistance</td><td class="highlight">${fmt(20053.10)}/yr (${fmt(6684.37)}/trimester)</td></tr>
+          <tr><td>Public education in Canada (board & lodging)</td><td class="highlight">${fmt(38970)}</td></tr>
+          <tr><td>IB Programme</td><td class="highlight">$325/yr program + $185/exam</td></tr>
+          <tr><td>AP Programme</td><td class="highlight">$250/yr + $125/exam</td></tr>
+          <tr><td>Commercial storage at post</td><td class="highlight">$500/yr</td></tr>
+        </table>
+        <ul style="margin-top:8px;">
+          <li>Elementary/secondary: up to 21st birthday</li>
+          <li>Post-secondary shelter: up to 23rd birthday (full-time attendance)</li>
+          <li>Your children: ${children618} (school-age), ${children1821} (18-21), ${children2123} (21-23 post-sec)</li>
+        </ul>
+      </div>
+    `) : fsdSection('34','Education Allowances','not-eligible','No Children',`<div class="fsd-rule">No dependent children entered.</div>`)}
+
+    ${totalChildren > 0 ? fsdSection('35','Education Travel','eligible','Eligible',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Economy class standard for all education travel</li>
+          <li>First year: Parent may accompany elementary/secondary student (both ways)</li>
+          <li>Subsequent years: Student travels alone (escort for under-13 at carrier's discretion)</li>
+          <li>Post-secondary: Student travels independently</li>
+          <li>Travel counted under FSD 51 Family Reunion entitlements</li>
+        </ul>
+      </div>
+    `) : ''}
+
+    <!-- PART IV: HEALTH -->
+    <div class="cat-header">Part IV &mdash; Health</div>
+
+    ${fsdSection('38','Preventive Medical Services','eligible',isUnhealthy ? 'Unhealthy Post' : 'Standard Post',`
+      <div class="fsd-rule">
+        ${isUnhealthy ? '<strong style="color:#c8102e;">This is classified as an unhealthy post.</strong><br>' : ''}
+        <strong>Covered at no cost to employee:</strong>
+        <ul>
+          <li>Pre-departure chest X-ray and physical examination</li>
+          <li>Required immunizations (employee and dependants)</li>
+          <li>Medical examinations on return from unhealthy post</li>
+          <li>Independent second medical opinions where authorized</li>
+          ${isUnhealthy ? '<li>Additional monitoring and health assessments</li>' : ''}
+        </ul>
+        <strong>Health Canada contact:</strong> overseas.ncrclinic@hc-sc.gc.ca | 1-855-312-1500
+      </div>
+    `)}
+
+    ${fsdSection('39','Health Care Expenses','eligible','Excess costs covered',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Covers health care expenses <em>exceeding</em> PSHCP and PSDCP reimbursement</li>
+          <li>Employee pays deductible and co-insurance amounts first</li>
+          <li>Paediatric, specialist, and para-medical care included</li>
+          <li>Hospital excess costs reimbursed (beyond plan limits)</li>
+          <li><strong>Note:</strong> PSHCP does not include emergency travel assistance — arrange separately</li>
+          <li>Level III hospital care recommended at posts without adequate facilities</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('41','Health Care Travel','eligible','Acute/Emergency only',`
+      <div class="fsd-rule">
+        <strong>This directive covers:</strong>
+        <ul>
+          <li>Acute, emergency medical conditions requiring treatment unavailable at post</li>
+          <li>Accouchement (childbirth) arrangements</li>
+        </ul>
+        <strong>This directive does NOT cover:</strong> routine, chronic, or elective treatments
+        <br><strong>Provider:</strong> AXA Assistance Canada (EWRC) +1 343-203-2665
+        <br><strong>Admissible expenses:</strong> Travel, accommodation (commercial only), meals, incidentals per NJC Travel Directive, phone calls
+      </div>
+    `)}
+
+    ${fsdSection('42','Medical/Dental Expense Advance','eligible','When needed',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Advance authorized where employee is eligible for PSHCP/PSDCP reimbursement</li>
+          <li>Minimum advance amount: <strong>$500</strong></li>
+          <li>Requires estimate from doctor/dentist/hospital covering 90% of advance requested</li>
+          <li>Repayable within 60 days of receiving insurance settlement cheque</li>
+          <li>Can be issued in Canadian dollars or local currency</li>
+        </ul>
+      </div>
+    `)}
+
+    <!-- PART V: LEAVE & TRAVEL -->
+    <div class="cat-header">Part V &mdash; Leave & Travel</div>
+
+    ${fsdSection('44','Holidays','eligible','Same as Canada',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Same number of designated paid holidays as collective agreement provides in Canada</li>
+          <li>Deputy head may substitute local holidays for Canadian holidays</li>
+          <li>If a Canadian holiday falls on a rest day at post, compensation or leave in lieu provided</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('46','Post Leave Option','info-only','Alternative to PSA',`
+      <div class="fsd-rule">
+        <strong>Post Leave vs. Post Specific Allowance:</strong> Employee must elect one.
+        <ul>
+          <li>Post Leave: <strong>10 days per year</strong>, accrued at 10/12 of a day per completed month</li>
+          <li>Maximum accumulation: 40 days; cash-out available on request or on return to Canada</li>
+          <li>Post Specific Allowance (FSD 56.11): <strong>${fmt(psaAnnual)}/yr</strong> for ${post || 'selected post'}</li>
+          <li>Change of election: written notice to FSD Administrator 2 months prior; max once per year</li>
+          <li><strong>Default:</strong> PSA is paid unless Post Leave is specifically requested</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('47','Leave for Post-Attributable Illness/Injury','eligible','Eligible',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Covers illness not endemic to Canada or injury not normally occurring in Canada</li>
+          <li>Medical service provider must determine illness/injury is post-attributable</li>
+          <li>Leave is NOT charged against employee's leave credits</li>
+          <li>Applies regardless of where employee is at time of absence</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('48','Other Leave','eligible','Up to 8 extra days',`
+      <div class="fsd-rule">
+        <ul>
+          <li>Deputy head may grant additional leave for family-related responsibilities or bereavement</li>
+          <li>Maximum: <strong>8 additional days</strong> per circumstance</li>
+          <li>Applies where hardship at post exceeds what would occur in Canada</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('49','FSD Travel Bank','info-only','Tracks travel allowances',`
+      <div class="fsd-rule">
+        The Travel Bank holds and tracks three types of travel allowances:
+        <ul>
+          <li><strong>FSD 50</strong> Post Travel Assistance &mdash; loaded on arrival at post</li>
+          <li><strong>FSD 51</strong> Family Reunion &mdash; loaded on arrival at post</li>
+          <li><strong>FSD 56.11</strong> Post Specific Allowance &mdash; loaded June 30 annually (or pro-rated)</li>
+        </ul>
+        Employee certifies use per FSD 70. Unused allowances lapse on posting termination.
+      </div>
+    `)}
+
+    ${fsdSection('50','Post Travel Assistance (PTA)','eligible',`${ptaFreq}`,`
+      <div class="fsd-rule">
+        <strong>PTA frequency based on hardship level:</strong>
+        <ul>
+          <li>Non-hardship: Once per tour (3+ years) or at end of posting</li>
+          <li>Levels I-II: Once per 2-year period + once per additional year</li>
+          <li>Levels III-V: Once per year + once per additional year beyond normal tour</li>
+        </ul>
+        <strong>Allowance rate:</strong> 80% of unrestricted return economy airfare to headquarters city (or 100% where no unrestricted fare available)<br>
+        <strong>Certification:</strong> 75% of allowance must be certified as spent on travel-related expenses<br>
+        <strong>Records:</strong> Retain evidence for 7 years<br>
+        ${hardship >= 3 ? '<strong>Hardship bonus (Level III-V):</strong> Travel from Level III-V posts may include additional shipment of goods (20 kg air shipment or one piece excess baggage per traveller).' : ''}
+      </div>
+    `)}
+
+    ${totalChildren > 0 || (deps > 0 && !spouseAccompanying) ? fsdSection('51','Family Reunion Travel','eligible','Eligible',`
+      <div class="fsd-rule">
+        <strong>Annual trip entitlements for dependent students:</strong>
+        <table>
+          <tr><th>Category</th><th>Location</th><th>Trips/Year</th></tr>
+          ${children618 > 0 ? `<tr><td>Elementary/Secondary (under 21)</td><td>Canada or away from post</td><td class="highlight">3 return trips</td></tr>` : ''}
+          ${children1821 > 0 ? `<tr><td>Secondary (18-21, not post-sec)</td><td>Any</td><td class="highlight">2 return trips</td></tr>` : ''}
+          ${children2123 > 0 ? `<tr><td>Post-secondary (22-23)</td><td>Canada or away from post</td><td class="highlight">1 return trip</td></tr>` : ''}
+        </table>
+        <ul style="margin-top:8px;">
+          <li>Allowance = lowest available economy airfare (APEX/discounted) from educational institution to post</li>
+          <li>Covers first 2 checked bags, local transportation, necessary stopovers</li>
+          <li>Special needs children: accompany allowance available under s.51.8</li>
+          <li>12-month period runs September 1 to August 31</li>
+          <li>Maximum 4 trips per 12-month period for same child (all sections combined)</li>
+          <li>Telephone calls: 1 five-minute call per month of academic year per separated student</li>
+        </ul>
+      </div>
+    `) : ''}
+
+    ${fsdSection('54','Compassionate Travel','eligible','When applicable',`
+      <div class="fsd-rule">
+        <strong>Triggers:</strong>
+        <ul>
+          <li>Serious illness/injury of dependent student or infirm child</li>
+          <li>Critical illness or death of parent (employee's or spouse's, including step/foster parents)</li>
+          <li>Critical illness or death of sibling (including half-siblings)</li>
+          <li>Critical illness or death of family unit member</li>
+          <li>Parent moving into elder-care facility (once per career per parent, per subsection 54.8)</li>
+        </ul>
+        Allowance: Lowest available economy airfare; accommodation in headquarters city up to 5 nights<br>
+        Parental death: Up to 2 parents per employee + 2 parents per spouse/CLP over career
+      </div>
+    `)}
+
+    <!-- PART VI: ALLOWANCES -->
+    <div class="cat-header">Part VI &mdash; Financial Allowances</div>
+
+    ${fsdSection('55','Post Living Allowance (PLA)','eligible',plaIndex > 100 ? fmt(plaAnnual)+'/yr' : 'Post index ≤ 100 — Not payable',`
+      <div class="fsd-rule">
+        ${plaIndex > 100 ? `
+        <strong>Calculation for salary ${fmt(salary)} at post index ${plaIndex}:</strong>
+        <table>
+          <tr><th>Step</th><th>Value</th></tr>
+          <tr><td>Salary band</td><td class="highlight">${fmt(getPLAEntry(salary).nominal)} (midpoint/nominal)</td></tr>
+          <tr><td>Adjustment factor</td><td class="highlight">${getPLAEntry(salary).adj}</td></tr>
+          <tr><td>Base amount (nominal × adjustment)</td><td class="highlight">${fmt(getPLAEntry(salary).nominal * getPLAEntry(salary).adj)}</td></tr>
+          <tr><td>At-post amount (base × index/100)</td><td class="highlight">${fmt(getPLAEntry(salary).nominal * getPLAEntry(salary).adj * (plaIndex / 100))}</td></tr>
+          <tr><td><strong>Annual PLA</strong></td><td class="highlight" style="color:#1a7f45;font-size:15px;">${fmt(plaAnnual)}</td></tr>
+        </table>
+        <br>Post index updated monthly by Statistics Canada. Max nominal salary for PLA: $100,000.<br>
+        PLA suspended after 25 compensation days absence (unaccompanied); continues while dependant remains at post (accompanied).
+        ` : `
+        <p>Post Living Allowance is only payable when the post index is greater than 100. Your entered index is ${plaIndex}.</p>
+        `}
+      </div>
+    `)}
+
+    ${fsdSection('56','Foreign Service Premium (FSP)','eligible',fmt(fspAnnual)+'/yr (tax-free)',`
+      <div class="fsd-rule">
+        <strong>Your FSP:</strong> Step ${['I','II','III','IV','V','VI'][fspStep]} (${fspPoints} points) &mdash; Family config: ${['Unaccompanied','+1 Dependant','+2 Dependants','+3 Dependants','+4+ Dependants'][depIdx]}
+        <table>
+          <tr><th>Step</th><th>Points</th><th>Unaccompanied</th><th>+1 Dep</th><th>+2 Dep</th><th>+3 Dep</th><th>+4+ Dep</th></tr>
+          ${[0,1,2,3,4,5].map(s => `<tr ${s===fspStep?'style="background:#eff6ff;font-weight:700;"':''}><td>${['I','II','III','IV','V','VI'][s]}</td><td>${['1-24','25-60','61-96','97-132','133-168','169+'][s]}</td>${[0,1,2,3,4].map(d=>`<td>${fmt(FSP_RATES[s][d])}</td>`).join('')}</tr>`).join('')}
+        </table>
+        <ul style="margin-top:8px;">
+          <li>1 point per month of service abroad (portable, non-lapsing)</li>
+          <li>Maximum 7 consecutive years at same post; then premium terminates unless deputy head approves extension</li>
+          <li>Tax-free payment</li>
+          <li>Adjusted when family configuration changes</li>
+        </ul>
+      </div>
+    `)}
+
+    ${psaAnnual > 0 ? fsdSection('56.11','Post Specific Allowance (PSA)','eligible',fmt(psaAnnual)+'/yr',`
+      <div class="fsd-rule">
+        <strong>PSA for ${post}:</strong> <strong style="font-size:16px;color:#1e40af;">${fmt(psaAnnual)}/year</strong> (effective June 1, 2025)
+        <ul>
+          <li>Non-accountable travel allowance representing 80% of unrestricted return economy airfare to Ottawa</li>
+          <li>Payable from first compensation day at post</li>
+          <li>Loaded into FSD Travel Bank on arrival and refreshed annually June 30</li>
+          <li>Mutually exclusive with FSD 46 Post Leave Option — employee chooses one</li>
+          <li>Advance of 1 year's PSA available after PCF for job-hunting trip or house-hunting for dependants</li>
+          <li>Updated annually June 1 per NJC Guide to Rates and Allowances</li>
+        </ul>
+      </div>
+    `) : fsdSection('56.11','Post Specific Allowance (PSA)','not-eligible','Post not selected or not listed',`<div class="fsd-rule">Select a post to see the PSA rate.</div>`)}
+
+    ${hardship > 0 ? fsdSection('58','Post Differential Allowance (PDA)','eligible',fmt(pdaWithBonus)+'/yr'+(pdaBonusApplies?' (incl. 50% bonus)':''),`
+      <div class="fsd-rule">
+        <strong>PDA for ${post || 'selected post'} (Level ${['','I','II','III','IV','V'][hardship]}):</strong>
+        <table>
+          <tr><th>Level</th><th>Unaccompanied</th><th>+1 Dep</th><th>+2 Dep</th><th>+3 Dep</th><th>+4+ Dep</th></tr>
+          ${[1,2,3,4,5].map(l => `<tr ${l===hardship?'style="background:#eff6ff;font-weight:700;"':''}><td>${['','I','II','III','IV','V'][l]}</td>${[0,1,2,3,4].map(d=>`<td>${fmt(PDA_RATES[l][d])}</td>`).join('')}</tr>`).join('')}
+        </table>
+        <strong>Your base PDA:</strong> ${fmt(pdaAnnual)}/yr
+        ${pdaBonusApplies ? `<br><strong style="color:#1a7f45;">50% Bonus applies</strong> (24+ consecutive months of hardship service): ${fmt(pdaWithBonus)}/yr total` : `<br><em>50% bonus not yet earned (requires 24 consecutive months of hardship service)</em>`}
+        <ul style="margin-top:8px;">
+          <li>Commences first compensation day following employee's/dependant's arrival at post</li>
+          <li>Adjusted when family configuration changes</li>
+          <li>Post rating levels set by Deputy Minister of Foreign Affairs</li>
+          <li>Extraordinary conditions (FSD 58.5): additional allowances possible in hostilities/natural disasters</li>
+        </ul>
+      </div>
+    `) : fsdSection('58','Post Differential Allowance (PDA)','not-eligible','No hardship level',`<div class="fsd-rule">No PDA payable for non-hardship posts. If your post has a hardship rating, select it above.</div>`)}
+
+    <!-- PART VII: DEPARTURE -->
+    <div class="cat-header">Part VII &mdash; Departure from Mission</div>
+
+    ${fsdSection('64','Emergency Evacuation and Loss','info-only','Contingency provision',`
+      <div class="fsd-rule">
+        <strong>Applies in event of hostilities, natural disaster, or threatening circumstances:</strong>
+        <ul>
+          <li>Authorized emergency evacuation to suitable location including Canada</li>
+          <li>Travelling and living expenses covered during evacuation period</li>
+          <li>Accountable advance for essential household effects: max <strong>$2,500/employee</strong> + <strong>$1,000/dependant</strong></li>
+          <li>Safeguarding of household effects left at post</li>
+          <li>Damage/loss compensation per FSD 15 provisions (up to $120K/$140K per housing type)</li>
+          <li>Monetary loss (bank deposits): up to 6 months' salary</li>
+          <li>PMV: Crown purchase possible after 6 months if unable to sell/ship</li>
+          <li>Posting loan repayments suspended during evacuation (no interest on suspension period)</li>
+        </ul>
+      </div>
+    `)}
+
+    ${fsdSection('66','Death Abroad','info-only','Contingency provision',`
+      <div class="fsd-rule">
+        <strong>Where employee or dependant dies at post:</strong>
+        <ul>
+          <li>Ambulance, hearse, embalming/cremation costs (excess over what would occur in Ottawa)</li>
+          <li>Body transportation expenses to place of interment</li>
+          <li>Applies to employee deaths and dependants residing at post or dependent students</li>
+          <li>Coordinated with worker's compensation and other applicable benefits</li>
+          <li>Multiple FSDs triggered: FSD 15, 25, 55, 56, 58 provisions adjusted accordingly</li>
+        </ul>
+      </div>
+    `)}
+
+    <!-- FSD 70 -->
+    <div class="cat-header">Administrative</div>
+
+    ${fsdSection('70','Allowances & Reporting Requirements','info-only','Administrative',`
+      <div class="fsd-rule">
+        <strong>Travel allowance certification:</strong>
+        <ul>
+          <li>FSD 50 (PTA): Certify 75% spent on travel/travel-related expenses</li>
+          <li>FSD 35, 51, 54, 58.5.1(d): Certify full amount spent for intended purpose</li>
+          <li><strong>Important (FSD 70.4.3):</strong> If you certify less than 75% (or cannot provide documentation on audit), you only repay the <strong>difference between the amount certified and the full allowance</strong> — not the full allowance. Only the uncertified portion is recoverable.</li>
+          <li>Certification form due within 30 days of travel completion or end of posting</li>
+          <li>Retain evidence for <strong>7 years</strong></li>
+        </ul>
+        <strong>Atypical expenses (FSD General Principles — confirmed in primary source):</strong> The deputy head has explicit discretion to approve expenses related to service abroad that are not otherwise provided for, where they are not the result of the employee's personal choices, fault, or negligence. Administrators cannot deny unique requests solely on the basis of lacking specific authority for that expenditure.
+        <br><br>
+        <strong>Deputy Head annual reporting:</strong> Due December 1 each year to Treasury Board Secretariat (fsd.dse@tbs-sct.gc.ca)
+      </div>
+    `)}
+
+    <div style="margin-top:24px;padding:14px 18px;background:#f0f4fa;border-radius:8px;font-size:12px;color:#6b7280;line-height:1.6;">
+      <strong>Sources &amp; Disclaimer:</strong> This tool is a reference guide. Primary source: <a href="https://www.njc-cnm.gc.ca/directive/fsd-dse/2025-04-01/en?comp" target="_blank" rel="noopener">NJC Foreign Service Directives (April 1, 2025)</a>. Secondary source: 2024 FSD Changes — video commentary. Where section numbers are cited inline (e.g., FSD 17.2.1(a)), these reference the primary NJC FSD document directly. Dollar amounts reflect rates effective April 1, 2026 (FSP, PDA) and June 1, 2025 (PSA, PLA Nominal Salary table). Rates are updated annually by the NJC FSD Committee. Always verify entitlements with your departmental FSD Administrator. This tool does not constitute an official determination of entitlements.
+    </div>
+  `;
+
+  // Attach toggle listeners
+  document.querySelectorAll('.fsd-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const body = h.nextElementSibling;
+      const toggle = h.querySelector('.fsd-toggle');
+      body.classList.toggle('open');
+      toggle.classList.toggle('open');
+    });
+  });
+
+  // Wrap acronyms in results panel with hover definitions
+  wrapAcronymsInNode(panel);
+}
+
+// NJC compiled FSD document URL (April 1, 2025 edition)
+const NJC_BASE = 'https://www.njc-cnm.gc.ca/directive/fsd-dse/2025-04-01/en?comp';
+
+// Section search hints for each FSD (to help users Ctrl+F in the NJC document)
+const FSD_SEARCH_HINTS = {
+  '10': 'Search "FSD 10" or "Posting Loan"',
+  '12': 'Search "FSD 12" or "Pre-Posting Training"',
+  '15': 'Search "FSD 15" or "Relocation"',
+  '16': 'Search "FSD 16" or "Principal Residence"',
+  '17': 'Search "FSD 17" or "Spouse" or "Common-law Partner Assistance"',
+  '18': 'Search "FSD 18" or "Special Family Separation"',
+  '25': 'Search "FSD 25" or "Shelter"',
+  '30': 'Search "FSD 30" or "Post Transportation"',
+  '32': 'Search "FSD 32" or "Daycare"',
+  '33': 'Search "FSD 33" or "Lyc\u00e9e"',
+  '34': 'Search "FSD 34" or "Education Allowances"',
+  '35': 'Search "FSD 35" or "Education Travel"',
+  '38': 'Search "FSD 38" or "Preventive Medical"',
+  '39': 'Search "FSD 39" or "Health Care Expenses"',
+  '41': 'Search "FSD 41" or "Health Care Travel"',
+  '42': 'Search "FSD 42" or "Medical/Dental Expense Advance"',
+  '44': 'Search "FSD 44" or "Holidays"',
+  '46': 'Search "FSD 46" or "Post Leave Option"',
+  '47': 'Search "FSD 47" or "Post-Attributable Illness"',
+  '48': 'Search "FSD 48" or "Other Leave"',
+  '49': 'Search "FSD 49" or "Travel Bank"',
+  '50': 'Search "FSD 50" or "Post Travel Assistance"',
+  '51': 'Search "FSD 51" or "Family Reunion"',
+  '54': 'Search "FSD 54" or "Compassionate Travel"',
+  '55': 'Search "FSD 55" or "Post Living Allowance"',
+  '56': 'Search "FSD 56" or "Foreign Service Incentive Allowances"',
+  '56.11': 'Search "56.11" or "Post Specific Allowance"',
+  '58': 'Search "FSD 58" or "Post Differential Allowance"',
+  '64': 'Search "FSD 64" or "Emergency Evacuation"',
+  '66': 'Search "FSD 66" or "Death Abroad"',
+  '70': 'Search "FSD 70" or "Allowances and Reporting"',
+};
+
+function fsdSection(num, title, status, badge, bodyHtml, refLabel, refAnchor) {
+  const statusClass = status === 'eligible' ? 'eligible' : status === 'not-eligible' ? 'not-eligible' : 'info-only';
+  const badgeClass = status === 'eligible' ? 'badge-eligible' : status === 'not-eligible' ? 'badge-not-eligible' : status === 'info-only' ? 'badge-info' : 'badge-amount';
+  const hint = FSD_SEARCH_HINTS[num] || `Search "FSD ${num}"`;
+  return `
+    <div class="fsd-section">
+      <div class="fsd-header ${statusClass}">
+        <div class="fsd-title">
+          <span class="fsd-num">FSD ${num}</span>
+          ${title}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="fsd-badge ${badgeClass}">${badge}</span>
+          <span class="fsd-toggle">&#8964;</span>
+        </div>
+      </div>
+      <div class="fsd-body">
+        ${bodyHtml}
+        <div class="fsd-ref">
+          <span class="fsd-ref-icon">&#128196;</span>
+          <span>Verify source:&nbsp;<a href="${NJC_BASE}" target="_blank" rel="noopener">NJC Foreign Service Directives (April 1, 2025)</a>&nbsp;&mdash;&nbsp;<em>${hint}</em></span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
