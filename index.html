@@ -242,26 +242,28 @@
     <!-- Form -->
     <div id="feedback-form-wrap">
       <form id="feedback-form" class="modal-body" onsubmit="submitFeedback(event)">
+        <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">All fields marked <span style="color:#c8102e;font-weight:700;">*</span> are required.</p>
         <div class="form-group">
-          <label for="fb-name">Your Name</label>
+          <label for="fb-name">Your Name <span style="color:#c8102e;">*</span></label>
           <input type="text" id="fb-name" name="name" placeholder="e.g. Jane Smith" required>
         </div>
         <div class="form-group">
-          <label for="fb-email">Your Email</label>
+          <label for="fb-email">Your Email <span style="color:#c8102e;">*</span></label>
           <input type="email" id="fb-email" name="email" placeholder="e.g. jane@example.com" required>
         </div>
         <div class="form-group">
-          <label for="fb-type">Type of Feedback</label>
-          <select id="fb-type" name="type">
+          <label for="fb-type">Type of Feedback <span style="color:#c8102e;">*</span></label>
+          <select id="fb-type" name="type" required>
             <option value="General">General feedback</option>
             <option value="Bug">Something is wrong / bug</option>
             <option value="Suggestion">Suggestion or feature request</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="fb-message">Message</label>
+          <label for="fb-message">Message <span style="color:#c8102e;">*</span></label>
           <textarea id="fb-message" name="message" placeholder="Tell us what's on your mind..." required></textarea>
         </div>
+        <p style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px;">Your name and email are collected solely to allow us to respond to your feedback and will not be shared with third parties or used for any other purpose. By submitting this form you consent to this use.</p>
       </form>
       <div class="modal-footer">
         <button class="btn-cancel" type="button" onclick="closeFeedback()">Cancel</button>
@@ -543,6 +545,17 @@
     <div id="results-panel"></div>
   </div>
 </div>
+
+<footer style="background:#1a3a5c;color:rgba(255,255,255,0.7);font-size:11px;line-height:1.7;padding:18px 32px;margin-top:0;">
+  <div style="max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-start;">
+    <div>
+      <strong style="color:#fff;">FSD Wizard</strong> &mdash; A personal project by Manoj. Not affiliated with the Government of Canada or the NJC.
+    </div>
+    <div style="max-width:640px;">
+      <strong style="color:#fff;">Privacy &amp; Data Notice:</strong> This tool runs entirely in your browser — no personal profile data is stored, transmitted, or retained by this site. The feedback form collects your name and email solely to enable a response to your message. This information is processed via Formspree and is not shared with any third party, used for marketing, or retained beyond what is necessary to respond. You may request deletion of your submitted data at any time by contacting us through the feedback form. This site does not use cookies or tracking technologies.
+    </div>
+  </div>
+</footer>
 
 <script>
 // =====================================================================
