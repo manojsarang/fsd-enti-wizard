@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FSD Wizard - Foreign Service Entitlements Tool</title>
+<title>FSD Wizard - Canadian Foreign Service Entitlements Tool</title>
 <style>
   :root {
     --primary: #1a3a5c;
@@ -46,7 +46,7 @@
   .form-group select:focus, .form-group input:focus { outline: 2px solid var(--primary); border-color: var(--primary); }
   .form-group .hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .btn-calculate { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.3px; transition: background 0.2s; }
+  .btn-calculate { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; transition: background 0.2s; }
   .btn-calculate:hover { background: #a50e27; }
 
   /* RESULTS PAGE */
@@ -57,7 +57,9 @@
   .results-panel h2 { font-size: 18px; color: var(--primary); margin-bottom: 16px; font-weight: 700; }
 
   /* SUMMARY CARDS */
-  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 1100px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
   .summary-card { background: var(--card); border-radius: 10px; box-shadow: var(--shadow); padding: 14px 16px; border-top: 3px solid var(--primary); }
   .summary-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
   .summary-card .value { font-size: 22px; font-weight: 700; color: var(--primary); margin-top: 4px; }
@@ -140,14 +142,14 @@
   /* FEEDBACK BUTTON */
   #feedback-btn {
     position: fixed; bottom: 28px; right: 28px; z-index: 8000;
-    background: var(--primary); color: #fff;
+    background: var(--accent); color: #fff;
     border: none; border-radius: 50px; padding: 12px 20px;
     font-size: 13px; font-weight: 700; cursor: pointer;
     box-shadow: 0 4px 16px rgba(0,0,0,0.22);
     display: flex; align-items: center; gap: 7px;
     transition: background 0.2s, transform 0.15s;
   }
-  #feedback-btn:hover { background: #0f2847; transform: translateY(-2px); }
+  #feedback-btn:hover { background: #a50e27; transform: translateY(-2px); }
 
   /* FEEDBACK MODAL */
   #feedback-overlay {
@@ -218,9 +220,30 @@
   }
   @media (max-width: 640px) {
     .form-columns { grid-template-columns: 1fr; }
-    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr 1fr; }
     #feedback-btn { bottom: 16px; right: 16px; padding: 10px 16px; }
   }
+
+  /* LANDING PAGE */
+  .landing-hero { text-align: center; padding: 48px 24px 36px; max-width: 820px; margin: 0 auto; }
+  .landing-hero .hero-icon { font-size: 56px; margin-bottom: 16px; }
+  .landing-hero h2 { font-size: 30px; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+  .landing-hero p { font-size: 15px; color: var(--muted); max-width: 580px; margin: 0 auto 32px; line-height: 1.7; }
+  .landing-cta { display: inline-block; background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 16px 40px; font-size: 17px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; transition: background 0.2s; }
+  .landing-cta:hover { background: #a50e27; }
+  .landing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 1100px; margin: 0 auto 32px; padding: 0 24px; }
+  .landing-card { background: var(--card); border-radius: 10px; box-shadow: var(--shadow); padding: 18px 20px; border-top: 3px solid var(--primary); }
+  .landing-card .lc-icon { font-size: 24px; margin-bottom: 8px; }
+  .landing-card h4 { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+  .landing-card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .why-box { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 22px 28px; margin: 0 24px 32px; border-left: 4px solid var(--primary); max-width: calc(1100px - 48px); margin-left: auto; margin-right: auto; }
+  .why-box .why-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 8px; }
+  .why-box p { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .why-box p + p { margin-top: 12px; }
+  .form-topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .form-topbar h2 { font-size: 18px; color: var(--primary); font-weight: 700; margin: 0; }
+  @media (max-width: 900px) { .landing-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 580px) { .landing-grid { grid-template-columns: 1fr; } .landing-hero { padding: 32px 16px 24px; } }
 </style>
 </head>
 <body>
@@ -285,23 +308,72 @@
 <header>
   <span class="maple">🍁</span>
   <div>
-    <h1>FSD Wizard</h1>
-    <span>Foreign Service Entitlements Calculator &mdash; Based on NJC Foreign Service Directives (April 1, 2025)</span>
+    <h1 style="cursor:pointer;" onclick="showHome()">FSD Wizard</h1>
+    <span>Canadian Foreign Service Entitlements Calculator &mdash; Based on NJC Foreign Service Directives (April 1, 2025)</span>
   </div>
 </header>
 
-<div class="notice">
-  <strong>Rate Notice:</strong> Dollar amounts reflect rates effective April 1, 2026 (FSP, PDA) and June 1, 2025 (PSA, PLA). Rates are updated annually &mdash; always verify against current NJC tables. Post Living Allowance requires a current post index from Statistics Canada.
+
+<!-- PAGE 0: LANDING -->
+<div id="home-page" class="page active">
+  <div class="landing-hero">
+    <div class="hero-icon">🍁</div>
+    <h2>FSD Wizard</h2>
+    <p>A free reference tool for Canadian Foreign Service officers and their families to understand NJC Foreign Service Directive entitlements — before and during a posting abroad.</p>
+    <button class="landing-cta" onclick="showForm()">&#9654;&nbsp; Calculate My Entitlements</button>
+  </div>
+
+  <div class="landing-grid">
+    <div class="landing-card">
+      <div class="lc-icon">✈️</div>
+      <h4>Pre-Posting</h4>
+      <p>Posting loan, relocation, household effects, vehicle shipping, pre-posting training, and principal residence provisions.</p>
+    </div>
+    <div class="landing-card">
+      <div class="lc-icon">🏠</div>
+      <h4>At Post: Living</h4>
+      <p>Shelter cost, transportation, hardship allowances, post living allowance, and family separation provisions.</p>
+    </div>
+    <div class="landing-card">
+      <div class="lc-icon">👨‍👩‍👧</div>
+      <h4>Family</h4>
+      <p>Spouse and CLP assistance, daycare, education allowances, education travel, and special separation assistance.</p>
+    </div>
+    <div class="landing-card">
+      <div class="lc-icon">🏥</div>
+      <h4>Health</h4>
+      <p>Preventive medical services, health care expenses, health care travel, and medical advance provisions.</p>
+    </div>
+    <div class="landing-card">
+      <div class="lc-icon">💰</div>
+      <h4>Financial Allowances</h4>
+      <p>Foreign Service Premium (FSP), Post Differential Allowance (PDA), Post Specific Allowance (PSA), and Post Living Allowance (PLA).</p>
+    </div>
+    <div class="landing-card">
+      <div class="lc-icon">🗓️</div>
+      <h4>Leave &amp; Travel</h4>
+      <p>Post Travel Assistance, Family Reunion travel, compassionate travel, post leave option, and related travel bank provisions.</p>
+    </div>
+  </div>
+
+  <div class="why-box">
+    <div class="why-title">Why We Built This</div>
+    <p>This tool was developed to provide Canadian Foreign Service officers with a clear, accessible starting point for understanding their FSD entitlements without having to navigate complex directives or rely solely on open-ended discussions with advisors. It acts as a preliminary decision-support layer that translates an individual's situation into a structured overview of applicable allowances, expected timing, and intended coverage. In contrast to the GAC's FSD Portal that displays what has already been paid, this tool establishes a baseline expectation of what <em>should</em> be received &mdash; enabling users to identify discrepancies, validate accuracy, and engage more effectively with FSD advisors through informed, targeted questions.</p>
+    <p>My name is Manoj and I am the spouse of a Foreign Service officer. This tool started as a small, personal project shaped by our own experience trying to navigate the complexities of Foreign Service Directives. We found it challenging to clearly understand entitlements and know whether everything was being applied as expected, which led me to build something simple to help make sense of it. It's very much a hobby project, but one that we've found genuinely useful, and we're happy to share it in the hope that it can make things a bit easier for others going through similar situations or provide a helpful starting point. Feel free to reach out through the feedback button with any suggestions to improve the tool.</p>
+  </div>
+
+  <div style="text-align:center;padding:0 24px 40px;">
+    <button class="landing-cta" onclick="showForm()">&#9654;&nbsp; Calculate My Entitlements</button>
+  </div>
 </div>
 
 <!-- PAGE 1: PROFILE FORM -->
-<div id="form-page" class="page active">
+<div id="form-page" class="page">
   <div class="page-wrap">
 
-    <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:22px 28px;margin-bottom:24px;border-left:4px solid var(--primary);">
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--primary);margin-bottom:8px;">Why We Built This</div>
-      <p style="font-size:13px;line-height:1.7;color:var(--text);">This tool was developed to provide Foreign Service officers with a clear, accessible starting point for understanding their FSD entitlements without having to navigate complex directives or rely solely on open-ended discussions with advisors. It acts as a preliminary decision-support layer that translates an individual's situation into a structured overview of applicable allowances, expected timing, and intended coverage. In contrast to the GAC's FSD Portal that displays what has already been paid, this tool establishes a baseline expectation of what <em>should</em> be received — enabling users to identify discrepancies, validate accuracy, and engage more effectively with FSD advisors through informed, targeted questions.</p>
-      <p style="font-size:13px;line-height:1.7;color:var(--text);margin-top:12px;">My name is Manoj and I am the spouse of a Foreign Service officer. This tool started as a small, personal project shaped by our own experience trying to navigate the complexities of Foreign Service Directives. We found it challenging to clearly understand entitlements and know whether everything was being applied as expected, which led me to build something simple to help make sense of it. It's very much a hobby project, but one that we've found genuinely useful, and we're happy to share it in the hope that it can make things a bit easier for others going through similar situations or provide a helpful starting point. Feel free to reach out through the feedback button with any suggestions to improve the tool.</p>
+    <div class="form-topbar">
+      <button class="btn-back" onclick="showHome()">&#8592; Home</button>
+      <h2>Your Profile</h2>
     </div>
 
     <div class="form-columns">
@@ -463,6 +535,19 @@
             <option value="yes">Yes</option>
           </select>
         </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;">
+            FSD 46 Election
+            <span class="tooltip-wrap">
+              <span class="tooltip-icon" data-tip="&lt;strong&gt;Post Specific Allowance (PSA):&lt;/strong&gt; A non-accountable travel allowance loaded into your Travel Bank each June 30. Based on 80% of economy return airfare to Ottawa from your post.&lt;br&gt;&lt;br&gt;&lt;strong&gt;Post Leave:&lt;/strong&gt; 10 extra days of leave per year (accrued monthly), with cash-out options. Must choose one — PSA is the default.">?</span>
+            </span>
+          </label>
+          <select id="fsd46-election">
+            <option value="psa">Post Specific Allowance (PSA) — default</option>
+            <option value="leave">Post Leave (10 days/year)</option>
+          </select>
+          <div class="hint">These are mutually exclusive. Written notice required to change election (2 months' notice, max once/year).</div>
+        </div>
       </div>
 
       <!-- COLUMN 4: HOUSING & DAYCARE -->
@@ -540,19 +625,25 @@
   <div class="page-wrap">
     <div class="results-topbar">
       <button class="btn-back" onclick="showForm()">&#8592; Back to Profile</button>
+      <button class="btn-back" onclick="showHome()" style="border-color:var(--muted);color:var(--muted);">&#8962; Home</button>
       <h2 id="results-heading">Entitlements Summary</h2>
     </div>
     <div id="results-panel"></div>
   </div>
 </div>
 
-<footer style="background:#1a3a5c;color:rgba(255,255,255,0.7);font-size:11px;line-height:1.7;padding:18px 32px;margin-top:0;">
-  <div style="max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-start;">
+<footer style="background:#1a3a5c;color:rgba(255,255,255,0.7);font-size:11px;line-height:1.8;padding:24px 32px;margin-top:0;">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
     <div>
-      <strong style="color:#fff;">FSD Wizard</strong> &mdash; A personal project by Manoj. Not affiliated with the Government of Canada or the NJC.
+      <div style="margin-bottom:12px;">
+        <strong style="color:#fff;">FSD Wizard</strong> &mdash; A personal project by Manoj. Not affiliated with the Government of Canada or the NJC.
+      </div>
+      <div style="margin-bottom:12px;padding:8px 10px;background:rgba(255,255,255,0.07);border-radius:5px;border-left:3px solid rgba(255,255,255,0.25);">
+        <strong style="color:rgba(255,255,255,0.9);">Rate Notice:</strong> Dollar amounts reflect rates effective April 1, 2026 (FSP, PDA) and June 1, 2025 (PSA, PLA). Rates are updated annually &mdash; always verify against current NJC tables. Post Living Allowance requires a current post index from Statistics Canada.
+      </div>
     </div>
-    <div style="max-width:640px;">
-      <strong style="color:#fff;">Privacy &amp; Data Notice:</strong> This tool runs entirely in your browser — no personal profile data is stored, transmitted, or retained by this site. The feedback form collects your name and email solely to enable a response to your message. This information is processed via Formspree and is not shared with any third party, used for marketing, or retained beyond what is necessary to respond. You may request deletion of your submitted data at any time by contacting us through the feedback form. This site does not use cookies or tracking technologies.
+    <div>
+      <strong style="color:#fff;">Privacy &amp; Data Notice:</strong> This tool runs entirely in your browser &mdash; no personal profile data is stored, transmitted, or retained by this site. The feedback form collects your name and email solely to enable a response to your message. This information is processed via Formspree and is not shared with any third party, used for marketing, or retained beyond what is necessary to respond. You may request deletion of your submitted data at any time by contacting us through the feedback form. This site does not use cookies or tracking technologies.
     </div>
   </div>
 </footer>
@@ -1016,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Wrap acronyms on the static sections at load time
-  wrapAcronymsInNode(document.querySelector('.notice'));
+  wrapAcronymsInNode(document.getElementById('home-page'));
   wrapAcronymsInNode(document.getElementById('form-page'));
 });
 
@@ -1108,13 +1199,22 @@ function calcPLA(salary, postIndex) {
 // =====================================================================
 // PAGE NAVIGATION
 // =====================================================================
+function showHome() {
+  document.getElementById('form-page').classList.remove('active');
+  document.getElementById('results-page').classList.remove('active');
+  document.getElementById('home-page').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function showForm() {
+  document.getElementById('home-page').classList.remove('active');
   document.getElementById('results-page').classList.remove('active');
   document.getElementById('form-page').classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showResults() {
+  document.getElementById('home-page').classList.remove('active');
   document.getElementById('form-page').classList.remove('active');
   document.getElementById('results-page').classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1150,6 +1250,7 @@ function calculate() {
   const pmvShip = document.getElementById('pmv-ship').value === 'yes';
   const pmvSpouseDrives = pmvShip && spouseAccompanying && document.getElementById('pmv-spouse-drives').value === 'yes';
   const pmvCount = pmvShip ? (pmvSpouseDrives ? 2 : 1) : 0;
+  const fsd46Election = document.getElementById('fsd46-election').value;
   const dcInfants = parseInt(document.getElementById('dc-infants').value) || 0;
   const dcToddlers = parseInt(document.getElementById('dc-toddlers').value) || 0;
   const dcPreschool = parseInt(document.getElementById('dc-preschool').value) || 0;
@@ -1202,7 +1303,7 @@ function calculate() {
 
   // PDA (Post Differential Allowance)
   const pdaAnnual = PDA_RATES[hardship][depIdx];
-  const pdaBonusApplies = hardship > 0 && tourMonths >= 24;
+  const pdaBonusApplies = hardship > 0 && tourMonths > 24;
   const pdaWithBonus = pdaBonusApplies ? pdaAnnual * 1.5 : pdaAnnual;
 
   // PLA (Post Living Allowance)
@@ -1240,7 +1341,7 @@ function calculate() {
       <div class="summary-card">
         <div class="label">Hardship Level</div>
         <div class="value">${hardship === 0 ? 'None' : 'Level ' + ['','I','II','III','IV','V'][hardship]}</div>
-        <div class="sub">PDA: ${fmt(pdaAnnual)}/yr${pdaBonusApplies ? ' + 50% bonus' : ''}</div>
+        <div class="sub">PDA: ${fmt(pdaAnnual)}/yr${pdaBonusApplies ? ' + 50% bonus (tour >24 mo)' : ''}</div>
       </div>
       <div class="summary-card">
         <div class="label">FSP Step</div>
@@ -1253,6 +1354,11 @@ function calculate() {
         <div class="sub">Max advance &mdash; repaid over 48 months, no interest</div>
       </div>
       <div class="summary-card">
+        <div class="label">One-Time Relocation</div>
+        <div class="value">$4,240</div>
+        <div class="sub">Incidental allowance (FSD 15.21) &mdash; auto, no receipts</div>
+      </div>
+      <div class="summary-card" style="grid-column: span 1;">
         <div class="label">Est. Annual Allowances</div>
         <div class="value">${fmt(totalAnnual)}</div>
         <div class="sub">FSP + PDA + PSA + PLA + Daycare + Education</div>
@@ -1279,12 +1385,21 @@ function calculate() {
       <div class="fsd-rule">
         <strong>Key provisions:</strong>
         <ul>
-          <li>Economy class air travel for employee and all dependants</li>
+          <li style="background:#eff6ff;border-left:3px solid #1e40af;padding:8px 10px;border-radius:4px;list-style:none;margin-bottom:8px;">
+            <strong style="color:#1e40af;">&#9733; Incidental Relocation Expense Allowance (FSD 15.21, Appendix C):</strong>
+            A flat <strong style="font-size:15px;">$4,240 per relocation</strong> (effective April 1, 2026). Non-accountable — no receipts required. Authorized automatically by the deputy head. This covers incidentals such as: utility connections/disconnections, pet shipping and quarantine, gratuities to movers, appliance conversions, cleaning, car rental, and other move-related costs not otherwise covered. Updated annually April 1.
+          </li>
+          <li><strong>Relocation travel — two options (FSD 15, Appendix A):</strong>
+            <ul style="margin-top:4px;">
+              <li><strong>Non-accountable (default):</strong> A lump-sum travel allowance calculated based on your travel allocation (mode of travel, stopovers, meals, and incidentals for 2 days at each end). This amount is paid automatically upon relocation — you do not need to submit receipts.</li>
+              <li><strong>Accountable (alternative):</strong> Submit actual and reasonable expenses for business class air travel up to the cost of the standard travel allocation. This option allows you to claim business class tickets if you choose — but you must submit receipts.</li>
+            </ul>
+          </li>
           <li>Household effects: weight entitlement based on family size and accommodation type</li>
           <li>Insurance: <strong>${housingType === 'crown' ? '$120,000' : '$140,000'}</strong> for ${housingType === 'crown' ? 'Crown-furnished' : housingType === 'crown-unfurnished' ? 'Crown-unfurnished' : 'privately leased/unfurnished'} accommodation (appraisal required for items over $1,500)</li>
           <li>Claims administrator: Crawford &amp; Company Canada (30-day Notice of Intent; 60-day claim)</li>
           <li>Storage of excess household effects in Canada</li>
-          <li>Temporary accommodation: 30 days at origin + 30 days at destination</li>
+          <li><strong>Temporary accommodation (FSD 15.23.3):</strong> Standard entitlement is <strong>2 days at origin + 2 days at destination</strong>. Extended accommodation (up to 30 days at each location) may be authorized by the deputy head where permanent accommodation is not available or suitable — this requires advance authorization and is not automatically granted.</li>
           <li><strong>Mold/contamination protection (FSD 15.23.1):</strong> If household effects arrive contaminated with mold making the residence unsafe, temporary accommodation expenses are covered until the situation is resolved</li>
           <li>Crossposting: transit may route through your last place of duty in Canada (not only Ottawa/Gatineau)</li>
           <li>Deferred relocation travel available on posting termination</li>
@@ -1319,7 +1434,7 @@ function calculate() {
           <li>Insurance during transit is provided; employee is responsible for coverage at post</li>
           <li>Same entitlement applies on return to Canada</li>
           <li>Note: Choosing not to ship your vehicle can contribute to generating a Flex Fund</li>
-          ${pmvSpouseDrives ? '' : spouseAccompanying ? '<li>If your spouse/CLP also holds a valid driver\'s licence, you may be entitled to ship a second vehicle — update your profile to reflect this.</li>' : ''}
+          ${pmvSpouseDrives ? '' : spouseAccompanying ? '<li>If your spouse/CLP also holds a valid driver\'s licence, you may be entitled to ship a second vehicle — go back to your profile and update the vehicle section.</li>' : ''}
         </ul>
         ` : `
         <ul>
@@ -1341,20 +1456,20 @@ function calculate() {
           <li>Legal/notary fees on purchase of new residence on return to Canada</li>
           <li>Mortgage default insurance premium covered if equity is less than 20% (FSD 16 Appendix B)</li>
         </ul>
-        <strong>House Hunting Trip (FSD 16.2.2):</strong>
+        ${housingType !== 'crown' ? `<strong>House Hunting Trip (FSD 16.2.2):</strong>
         <div class="fsd-rule" style="margin-top:8px;background:#f0fdf4;border-left:3px solid var(--green);">
           You may be eligible for a <strong>house hunting trip</strong> before your move:
           <ul style="margin-top:6px;">
             <li>Advance of up to <strong>1 month's rent</strong> at the new place of duty in Canada, or <strong>3 months' rent</strong> outside Canada, to hold rental accommodation before reporting for duty</li>
             <li>Travel expenses for the trip may be covered where the deputy head is satisfied the arrangement is reasonable and justified</li>
-            <li>Costs of a house hunting trip (flights, accommodation) that result in a successful placement may be deducted from the initial 30-day temporary accommodation period</li>
+            <li>Costs of a house hunting trip (flights, accommodation) that result in a successful placement may be deducted from the initial temporary accommodation period</li>
             <li>Discuss timing and approval with your FSD Administrator prior to travel — pre-approval is required</li>
           </ul>
-        </div>
+        </div>` : '<p style="margin-top:8px;font-size:13px;color:var(--muted);"><em>House Hunting Trip: not applicable — Crown-furnished accommodation is assigned by the mission.</em></p>'}
       </div>
-    `) : fsdSection('16','Principal Residence','info-only','House Hunting Trip Available',`
+    `) : fsdSection('16','Principal Residence', housingType !== 'crown' ? 'info-only' : 'not-eligible', housingType !== 'crown' ? 'House Hunting Trip Available' : 'Not applicable (Crown-Furnished)',`
       <div class="fsd-rule">
-        No principal residence indicated, but you may still be eligible for a <strong>house hunting trip</strong> before your move to a new place of duty (FSD 16.2.2). Travel and pre-move rental advance costs may be covered where the deputy head is satisfied the arrangement is reasonable. Speak with your FSD Administrator before travel — pre-approval is required.
+        ${housingType !== 'crown' ? 'No principal residence indicated, but you may still be eligible for a <strong>house hunting trip</strong> before your move to a new place of duty (FSD 16.2.2). Travel and pre-move rental advance costs may be covered where the deputy head is satisfied the arrangement is reasonable. Speak with your FSD Administrator before travel — pre-approval is required.' : 'Crown-furnished accommodation is assigned by the mission. A house hunting trip is not applicable for Crown-furnished postings.'}
       </div>
     `)}
 
@@ -1375,16 +1490,25 @@ function calculate() {
 
     ${fsdSection('25','Shelter','eligible','Employer manages',`
       <div class="fsd-rule">
-        <strong>Shelter Cost (employee contribution):</strong> Based on salary group and household size per Appendix A of FSD 25 (effective April 1, 2026). Check current rate table.
-        <ul>
-          <li>Space target (FSD 25.1.2): ${deps === 0 ? '2-bedroom (1 person)' : deps <= 3 ? '3-bedroom (2-4 persons)' : '4-bedroom (5+ persons)'} — these are targets/guidelines, not absolute rules; flexibility exists for atypical family configurations</li>
-          <li>Housing type: <strong>${housingType === 'crown' ? 'Crown-Furnished' : housingType === 'crown-unfurnished' ? 'Crown-Unfurnished' : 'Privately Leased / Unfurnished'}</strong></li>
-          <li>Deficiency adjustment: 10% / 20% / 30% for inadequate space</li>
-          <li>Security deposit advance: up to 6 months' rent</li>
+        <strong>Your Shelter Cost (employee contribution — FSD 25 Appendix A):</strong>
+        <table style="margin-top:8px;">
+          <tr><th>Input</th><th>Your Value</th></tr>
+          <tr><td>Annual salary</td><td class="highlight">${fmt(salary)}</td></tr>
+          <tr><td>Estimated salary group</td><td class="highlight">${getShelterGroup(salary)} <span style="font-weight:400;color:var(--muted);font-size:11px;">(see note below)</span></td></tr>
+          <tr><td>Household size</td><td class="highlight">${1 + deps} person${1+deps !== 1 ? 's' : ''}</td></tr>
+          <tr><td>Space target (FSD 25.1.2)</td><td class="highlight">${deps === 0 ? '2-bedroom' : deps <= 3 ? '3-bedroom' : '4-bedroom'}</td></tr>
+          <tr><td>Housing type</td><td class="highlight">${housingType === 'crown' ? 'Crown-Furnished' : housingType === 'crown-unfurnished' ? 'Crown-Unfurnished' : 'Privately Leased / Unfurnished'}</td></tr>
+        </table>
+        <div style="margin-top:10px;padding:8px 10px;background:#fffbeb;border-left:3px solid #f59e0b;border-radius:4px;font-size:12px;">
+          <strong>To find your exact monthly shelter cost:</strong> Look up Salary Group ${getShelterGroup(salary)}, household size ${1+deps}, in <a href="https://www.njc-cnm.gc.ca/directive/fsd-dse/2025-04-01/en?comp" target="_blank" rel="noopener">FSD 25 Appendix A</a>. Salary groups are defined in the FSD and adjusted annually by the NJC FSD Committee &mdash; verify the current bands with your FSD Administrator.
+        </div>
+        <ul style="margin-top:10px;">
+          <li>Deficiency adjustment: 10% / 20% / 30% reduction for inadequate accommodation (FSD 25.16)</li>
+          <li>Security deposit advance: up to 6 months' rent (FSD 25.4.5)</li>
           ${housingType === 'crown' ? '<li>Utilities reimbursed for Crown-furnished accommodation</li>' : ''}
           ${housingType === 'crown-unfurnished' ? '<li>Crown-unfurnished: furniture rental costs may be covered; utilities are your responsibility unless otherwise specified in your occupancy agreement</li>' : ''}
-          <li><strong>Self-serve maintenance (FSD 25.5.3):</strong> No prior deputy head approval is required for repairs or maintenance unless the anticipated cost exceeds <strong>$500</strong> for any one service, or $1,000 in any fiscal year</li>
-          <li>If major appliances are broken or missing, corrective action must be taken <strong>as quickly as possible</strong> — you have grounds to demand timely resolution</li>
+          <li><strong>Self-serve maintenance (FSD 25.5.3):</strong> No prior deputy head approval required for repairs unless the anticipated cost exceeds <strong>$500</strong> for any one service, or $1,000 in any fiscal year</li>
+          <li>If major appliances are broken or missing, corrective action must be taken <strong>as quickly as possible</strong></li>
           <li>Shelter cost ceases on last day of posting + travel days</li>
         </ul>
       </div>
@@ -1458,7 +1582,7 @@ function calculate() {
       </div>
     `) : fsdSection('32','Daycare Assistance','not-eligible','No Eligible Children',`<div class="fsd-rule">No children in daycare age range entered.</div>`)}
 
-    ${empType === 'career' ? fsdSection('33','Education at Lycée in Canada','eligible','Career employees only',`
+    ${empType === 'career' && totalChildren > 0 ? fsdSection('33','Education at Lycée in Canada','eligible','Career employees only',`
       <div class="fsd-rule">
         <ul>
           <li>Child must be minimum 3 years 8 months by September 1</li>
@@ -1467,7 +1591,7 @@ function calculate() {
           <li>Costs covered per actual program fees</li>
         </ul>
       </div>
-    `) : fsdSection('33','Education at Lycée in Canada','not-eligible','Career employees only',`<div class="fsd-rule">FSD 33 applies to career foreign service employees only.</div>`)}
+    `) : empType === 'career' ? fsdSection('33','Education at Lycée in Canada','not-eligible','No Dependent Children',`<div class="fsd-rule">You have no dependent children entered. FSD 33 applies to career foreign service employees with eligible children (minimum age 3 years 8 months by September 1).</div>`) : fsdSection('33','Education at Lycée in Canada','not-eligible','Career employees only',`<div class="fsd-rule">FSD 33 applies to career foreign service employees only.</div>`)}
 
     ${totalChildren > 0 ? fsdSection('34','Education Allowances','eligible',fmt(eduAnnual)+'/yr est.',`
       <div class="fsd-rule">
@@ -1573,20 +1697,30 @@ function calculate() {
       </div>
     `)}
 
-    ${fsdSection('46','Post Leave Option','info-only','Alternative to PSA',`
+    ${fsd46Election === 'leave' ? fsdSection('46','Post Leave Option','eligible','Elected: Post Leave',`
       <div class="fsd-rule">
-        <strong>Post Leave vs. Post Specific Allowance:</strong> Employee must elect one.
+        <strong>You have elected Post Leave (FSD 46) in preference to PSA.</strong>
         <ul>
-          <li>Post Leave: <strong>10 days per year</strong>, accrued at 10/12 of a day per completed month</li>
+          <li><strong>10 days of additional leave per year</strong>, accrued at 10/12 of a day per completed month at post</li>
           <li>Maximum accumulation: 40 days; cash-out available on request or on return to Canada</li>
+          <li>Unused Post Leave can be carried forward up to the 40-day maximum</li>
+          <li>Change of election: written notice to FSD Administrator 2 months prior; max once per year</li>
+          <li>Note: PSA (${post ? fmt(psaAnnual)+'/yr for '+post : 'amount depends on post'}) is forfeited while Post Leave is elected</li>
+        </ul>
+      </div>
+    `) : fsdSection('46','Post Leave Option','info-only','PSA elected (default)',`
+      <div class="fsd-rule">
+        <strong>You are receiving the Post Specific Allowance (PSA) — the default election.</strong> If you prefer extra leave instead, you may elect Post Leave.
+        <ul>
+          <li>Post Leave: <strong>10 days per year</strong>, accrued monthly; max 40 days accumulation; cash-out available</li>
           <li>Post Specific Allowance (FSD 56.11): <strong>${fmt(psaAnnual)}/yr</strong> for ${post || 'selected post'}</li>
           <li>Change of election: written notice to FSD Administrator 2 months prior; max once per year</li>
-          <li><strong>Default:</strong> PSA is paid unless Post Leave is specifically requested</li>
+          <li>These are <strong>mutually exclusive</strong> — you cannot receive both</li>
         </ul>
       </div>
     `)}
 
-    ${fsdSection('47','Leave for Post-Attributable Illness/Injury','eligible','Eligible',`
+    ${fsdSection('47','Leave for Post-Attributable Illness/Injury','info-only','Contingency provision',`
       <div class="fsd-rule">
         <ul>
           <li>Covers illness not endemic to Canada or injury not normally occurring in Canada</li>
@@ -1597,7 +1731,7 @@ function calculate() {
       </div>
     `)}
 
-    ${fsdSection('48','Other Leave','eligible','Up to 8 extra days',`
+    ${fsdSection('48','Other Leave','info-only','Contingency provision',`
       <div class="fsd-rule">
         <ul>
           <li>Deputy head may grant additional leave for family-related responsibilities or bereavement</li>
@@ -1654,7 +1788,7 @@ function calculate() {
       </div>
     `) : ''}
 
-    ${fsdSection('54','Compassionate Travel','eligible','When applicable',`
+    ${fsdSection('54','Compassionate Travel','info-only','Contingency provision',`
       <div class="fsd-rule">
         <strong>Triggers:</strong>
         <ul>
@@ -1708,7 +1842,9 @@ function calculate() {
       </div>
     `)}
 
-    ${psaAnnual > 0 ? fsdSection('56.11','Post Specific Allowance (PSA)','eligible',fmt(psaAnnual)+'/yr',`
+    ${fsd46Election === 'leave' ? fsdSection('56.11','Post Specific Allowance (PSA)','not-eligible','Not elected — Post Leave chosen',`
+      <div class="fsd-rule">You have elected Post Leave (FSD 46) instead of PSA. The PSA rate for ${post || 'your post'} is ${psaAnnual > 0 ? fmt(psaAnnual)+'/yr' : 'unavailable — select a post'} but is not payable while Post Leave is elected. To switch back, provide written notice to your FSD Administrator at least 2 months in advance.</div>
+    `) : psaAnnual > 0 ? fsdSection('56.11','Post Specific Allowance (PSA)','eligible',fmt(psaAnnual)+'/yr',`
       <div class="fsd-rule">
         <strong>PSA for ${post}:</strong> <strong style="font-size:16px;color:#1e40af;">${fmt(psaAnnual)}/year</strong> (effective June 1, 2025)
         <ul>
@@ -1730,7 +1866,7 @@ function calculate() {
           ${[1,2,3,4,5].map(l => `<tr ${l===hardship?'style="background:#eff6ff;font-weight:700;"':''}><td>${['','I','II','III','IV','V'][l]}</td>${[0,1,2,3,4].map(d=>`<td>${fmt(PDA_RATES[l][d])}</td>`).join('')}</tr>`).join('')}
         </table>
         <strong>Your base PDA:</strong> ${fmt(pdaAnnual)}/yr
-        ${pdaBonusApplies ? `<br><strong style="color:#1a7f45;">50% Bonus applies</strong> (24+ consecutive months of hardship service): ${fmt(pdaWithBonus)}/yr total` : `<br><em>50% bonus not yet earned (requires 24 consecutive months of hardship service)</em>`}
+        ${pdaBonusApplies ? `<br><strong style="color:#1a7f45;">50% Bonus applies</strong> (tour extends beyond 24 consecutive months of hardship service): ${fmt(pdaWithBonus)}/yr total` : `<br><em>50% bonus not applicable — requires more than 24 consecutive months at a hardship post (FSD 58.6.3). Your ${tourMonths}-month tour does not trigger this provision.</em>`}
         <ul style="margin-top:8px;">
           <li>Commences first compensation day following employee's/dependant's arrival at post</li>
           <li>Adjusted when family configuration changes</li>
@@ -1738,7 +1874,7 @@ function calculate() {
           <li>Extraordinary conditions (FSD 58.5): additional allowances possible in hostilities/natural disasters</li>
         </ul>
       </div>
-    `) : fsdSection('58','Post Differential Allowance (PDA)','not-eligible','No hardship level',`<div class="fsd-rule">No PDA payable for non-hardship posts. If your post has a hardship rating, select it above.</div>`)}
+    `) : fsdSection('58','Post Differential Allowance (PDA)','not-eligible','No hardship level',`<div class="fsd-rule">No PDA payable for non-hardship posts. If your post has a hardship rating, go back to your profile and update the Hardship Level field.</div>`)}
 
     <!-- PART VII: DEPARTURE -->
     <div class="cat-header">Part VII &mdash; Departure from Mission</div>
@@ -1810,6 +1946,17 @@ function calculate() {
   wrapAcronymsInNode(panel);
 }
 
+// FSD 25 Appendix A — Shelter cost salary group helper
+// Groups are approximate salary bands; exact thresholds are in FSD 25 Appendix A and adjusted annually.
+function getShelterGroup(salary) {
+  if (salary < 62000) return 'A';
+  if (salary < 78000) return 'B';
+  if (salary < 97000) return 'C';
+  if (salary < 119000) return 'D';
+  if (salary < 148000) return 'E';
+  return 'F';
+}
+
 // NJC compiled FSD document URL (April 1, 2025 edition)
 const NJC_BASE = 'https://www.njc-cnm.gc.ca/directive/fsd-dse/2025-04-01/en?comp';
 
@@ -1856,7 +2003,7 @@ function fsdSection(num, title, status, badge, bodyHtml, refLabel, refAnchor) {
     <div class="fsd-section">
       <div class="fsd-header ${statusClass}">
         <div class="fsd-title">
-          <span class="fsd-num">FSD ${num}</span>
+          <a href="${NJC_BASE}" target="_blank" rel="noopener" class="fsd-num" onclick="event.stopPropagation()" style="text-decoration:none;">FSD ${num}</a>
           ${title}
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
