@@ -1,0 +1,23 @@
+{
+  "name": "fsd-enti-wizard",
+  "version": "1.0.0",
+  "description": "FSD Wizard is a personal browser-based reference tool for understanding potential Canadian Foreign Service entitlements under the National Joint Council Foreign Service Directives.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manojsarang/fsd-enti-wizard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manojsarang/fsd-enti-wizard/issues"
+  },
+  "homepage": "https://github.com/manojsarang/fsd-enti-wizard#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
