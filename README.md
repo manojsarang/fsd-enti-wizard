@@ -1,197 +1,66 @@
-# fsd-enti-wizard
 # FSD Wizard
 
-FSD Wizard is a personal browser-based reference tool for understanding potential Canadian Foreign Service entitlements under the National Joint Council Foreign Service Directives.
+A free, browser-based reference tool for Canadian Foreign Service officers and their families to understand NJC Foreign Service Directive (FSD) entitlements before and during a posting abroad.
 
-It helps a user turn a posting profile into a structured summary of likely allowances, travel-related provisions, and key administrative requirements. It is designed as a practical reference tool, not an official entitlement decision system.
+**Live tool:** [fsd-wizard.vercel.app](https://fsd-wizard.vercel.app)
 
-## Overview
+---
 
-The tool is intended to help Foreign Service employees and families answer questions such as:
+## What it does
 
-- What allowances may apply at this post?
-- What changes based on hardship level, dependants, or tour length?
-- What should I expect to review with an FSD Administrator?
-- Which FSD sections are relevant to my situation?
+Enter your posting profile — post city, salary, family situation, housing type, and tour details — and the tool generates a structured entitlement summary. The results page shows estimated annual allowances, a shelter contribution deduction (FSD 25), and an estimated net annual position.
 
-The goal is to provide a clearer starting point before or during a posting abroad.
+## Covered areas
 
-## Features
+- Pre-posting: posting loan, relocation, household effects, vehicle shipping, principal residence
+- At-post living: shelter cost, transportation, hardship allowances, post living allowance, family separation
+- Family: spouse/CLP assistance, daycare, education allowances, education travel, special separation
+- Health: preventive medical, health care expenses, health care travel, medical advance
+- Financial allowances: FSP, PDA, PSA, PLA
+- Leave and travel: post travel assistance, family reunion, compassionate travel, post leave option
 
-- Browser-based calculator with no installation required
-- Single profile form covering employment, family, posting, housing, vehicle, and daycare inputs
-- Estimated annual allowance summary where rate-based calculations are possible
-- Expandable results by FSD section
-- Embedded explanations for key entitlements and conditions
-- Searchable post selector with auto-fill for hardship level and unhealthy post status
-- Direct links back to the NJC Foreign Service Directives
-- Feedback form for bugs, suggestions, and general comments
+## Key features
 
-## Covered Areas
+- Nothing is stored or transmitted — all calculations run locally in your browser
+- All figures are traceable to NJC FSD source text (April 1, 2026 rates)
+- Government of Canada (Canada.ca) visual design
+- Post search auto-fills hardship level and unhealthy post status
+- PSA / Post Leave election toggle (FSD 46) adjusts totals correctly
+- PDA tour-weighted average for postings beyond 24 months (FSD 58)
+- Shelter contribution deduction (FSD 25, Appendix A) based on salary and household size
+- Daycare section enables automatically when children under 6 are entered
 
-The tool includes guidance or calculations related to topics such as:
+## How to use
 
-- Posting Loan
-- Relocation
-- Principal Residence
-- Spouse or common-law partner assistance
-- Special Family Separation Assistance
-- Shelter
-- Transportation at post
-- Daycare
-- Education and education travel
-- Preventive medical and health-related provisions
-- Post Travel Assistance
-- Family Reunion Travel
-- Compassionate Travel
-- Post Living Allowance
-- Foreign Service Premium
-- Post Specific Allowance
-- Post Differential Allowance
-- Emergency evacuation and loss
-- Allowance reporting and certification requirements
+1. Open `FSD_Wizard.html` in a web browser (or visit the live link above)
+2. Fill in your posting and family details
+3. Click **Generate Entitlement Summary**
+4. Review the summary cards and expand individual FSD sections for detail
+5. Use the source links in the tool to verify the governing directive language
 
-## How to Use
+## Rates in use
 
-1. Open `FSD_Wizard.html` in a web browser.
-2. Enter the relevant profile details.
-3. Click **Calculate My Entitlements**.
-4. Review the summary cards and expand individual FSD sections for detail.
-5. Use the source links in the tool to verify the governing directive language.
+| Table | Effective date |
+|---|---|
+| FSP, PDA, Posting Loan maximum | April 1, 2026 |
+| Shelter Contribution (FSD 25, Appendix A) | April 1, 2026 |
+| PSA, PLA | June 1, 2025 |
 
-## Source Basis
+## Source basis
 
-The tool is based primarily on:
+- [NJC Foreign Service Directives](https://www.njc-cnm.gc.ca/directive/fsd-dse/en)
+- [FSD 25 Appendix A — Shelter Contribution Table](https://www.njc-cnm.gc.ca/directive/d114/v307/s919/en)
 
-- NJC Foreign Service Directives, April 1, 2025 edition
-- NJC Guide to Rates and Allowances
+## Technical notes
 
-The current implementation also embeds specific rate tables and post data directly in the HTML file.
-
-According to the tool content, key rates currently reflected include:
-
-- April 1, 2026 rates for FSP and PDA
-- June 1, 2025 rates for PSA and PLA-related tables
-
-These values should be reviewed periodically against current NJC sources.
-
-## Important Notes
-
-- This is a personal project.
-- It is not affiliated with the Government of Canada or the NJC.
-- It is a reference and decision-support tool only.
-- It does not provide official entitlement determinations.
-- Some entitlements are estimated or simplified for usability.
-- Users should confirm final interpretations and payments with their departmental FSD Administrator.
-
-## Privacy
-
-The calculator logic runs in the browser.
-
-Based on the current implementation:
-
-- Profile data entered for calculations is not stored by the tool
-- Profile data is not transmitted as part of the calculator workflow
-- The site does not use cookies or tracking technologies
-
-The only external submission in the current version is the feedback form.
-
-## Feedback
-
-The tool includes a feedback modal that collects:
-
-- Name
-- Email address
-- Feedback type
-- Message
-
-Feedback is submitted through Formspree and is intended only to support follow-up on user feedback.
-
-## Technical Notes
-
-This project is intentionally simple.
-
-- Single-file application: `FSD_Wizard.html`
-- Built with plain HTML, CSS, and JavaScript
-- No framework
-- No build step
-- No package manager
-- No backend required for calculator functionality
-- Formspree used only for feedback submission
-
-The file contains:
-
-- UI markup
-- Styling
-- Post and rate tables
-- Input helpers
-- Calculation logic
-- Results rendering
-- Feedback modal logic
-
-## Project Structure
-
-Current structure:
-
-```text
-.
-└── FSD_Wizard.html
-```
-
-Everything is self-contained inside that file.
-
-## Calculation Approach
-
-The tool uses a combination of:
-
-- Embedded rate lookups
-- Rule-based conditional logic
-- Post-specific mappings
-- Explanatory sections for provisions that are not directly calculable
-
-Examples include:
-
-- FSP based on foreign service points and dependant count
-- PDA based on hardship level and dependant count
-- PSA based on selected post
-- PLA based on salary band and post index
-- Daycare estimates using embedded ceilings and employee share assumptions
-- Education-related estimates based on child age categories
-
-## Maintenance
-
-Since this is a personal single-file project, the main maintenance tasks are straightforward:
-
-- Update annual rates
-- Update post-specific PSA data
-- Update hardship and post condition data where needed
-- Review explanatory text against current FSD wording
-- Check external source links
-- Confirm the feedback endpoint still works
-
-## Configuration
-
-The feedback form is configured in JavaScript using a Formspree form ID.
-
-Current value in the file:
-
-```js
-const FORMSPREE_ID = 'xojyjzvk';
-```
-
-If feedback routing changes, that value needs to be updated.
-
-## Possible Future Improvements
-
-Potential future improvements could include:
-
-- Adding a visible version number and last updated date
-- Adding a changelog for rate updates
-- Improving print output
-- Adding export support for summaries
-- Moving rate tables into separate data files for easier annual updates
-- Tightening validation and input guidance for estimated fields
+Single-file application — `FSD_Wizard.html` — built with plain HTML, CSS, and JavaScript. No framework, no build step, no backend. The feedback form uses Formspree (`xojyjzvk`).
 
 ## Disclaimer
 
-FSD Wizard is a personal reference project intended to help users understand possible Foreign Service entitlements and prepare better questions for official advisors. It should not be treated as an official interpretation of the Foreign Service Directives or as a substitute for departmental review.
+This is an independent hobby project. It is not affiliated with the Government of Canada or the NJC. Use it as a structured starting point, not as an official entitlement determination. Always confirm with your departmental FSD administrator and the NJC source text.
+
+## Feedback
+
+Use the feedback link inside the tool, or [open an issue](https://github.com/manojsarang/fsd-wizard/issues).
+
+If it has been useful, [buying me a coffee](https://www.paypal.com/donate/?business=s.manojrao%40gmail.com&currency_code=CAD&item_name=FSD+Wizard) is appreciated.
